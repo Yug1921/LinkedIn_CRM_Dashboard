@@ -131,6 +131,8 @@ export default function LeadsPageClient() {
     staleTime: 30_000,
   })
 
+  console.log("API BASE:", process.env.NEXT_PUBLIC_API_BASE)
+
   const { data, isLoading, isError, isFetching, refetch } = useQuery({
     queryKey: [
       "leads",
