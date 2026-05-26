@@ -18,6 +18,7 @@ import { format } from "date-fns"
 
 import { api } from "@/lib/api"
 import { statusLabel } from "@/lib/utils"
+import type { LeadStatus } from "@/types/lead"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
