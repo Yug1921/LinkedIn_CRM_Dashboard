@@ -12,7 +12,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://linked-in-crm-dashboard.vercel.app",
+        "https://linked-in-crm-dashboard-git-main-yugyugupadhyay-7261s-projects.vercel.app",
+        "*",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
