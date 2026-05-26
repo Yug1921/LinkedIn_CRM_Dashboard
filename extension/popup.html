@@ -13,7 +13,7 @@
   --r:8px;--mono:'Courier New',monospace;--sans:system-ui,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{width:320px;background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:13px;overflow:hidden;}
+body{width:400px;background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:13px;overflow:hidden;}
 
 /* Header */
 .hd{background:var(--s1);border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
@@ -97,7 +97,7 @@ select{width:100%;background:var(--s1);border:1px solid var(--bd);border-radius:
 select:focus{border-color:var(--accent);}
 select option{background:var(--s2);}
 .irow{display:flex;gap:5px;}
-input[type=text]{flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);color:var(--t1);padding:6px 9px;font-family:var(--mono);font-size:10px;outline:none;transition:border-color .15s;min-width:0;}
+input[type=text]{flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);color:var(--t1);padding:6px 9px;font-family:var(--mono);font-size:11px;outline:none;transition:border-color .15s;min-width:0;}
 input[type=text]:focus{border-color:var(--accent);}
 .btn{border:none;border-radius:var(--r);cursor:pointer;font-family:var(--sans);font-weight:600;font-size:11px;transition:all .15s;padding:6px 11px;}
 .btn-save{background:var(--adim);color:var(--accent);border:1px solid rgba(0,229,160,.3);}
@@ -204,7 +204,7 @@ input[type=text]:focus{border-color:var(--accent);}
   <div>
     <div class="slbl">Backend API</div>
     <div class="irow">
-      <input type="text" id="api" placeholder="http://127.0.0.1:8000"/>
+      <input type="text" id="api" placeholder="https://linkedin-crm-dashboard.onrender.com"/>
       <button class="btn btn-save" id="save">Save</button>
     </div>
     <div style="margin-top:5px;">

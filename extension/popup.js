@@ -120,7 +120,7 @@ function load() {
     syncToggle(stats.enabled);
     setCount(stats.daily_scrape_count, stats.dup_count || 0, stats.offline_queue_size);
     $('cat').value = stats.selected_category || 'crypto_influencer';
-    $('api').value = stats.api_base || 'http://127.0.0.1:8000';
+    $('api').value = stats.api_base || 'https://linkedin-crm-dashboard.onrender.com';
     setStatus(stats.last_capture_status || 'idle', stats.last_capture_name);
     if (stats.offline_queue_size > 0) {
       $('oq-badge').textContent = `▲ ${stats.offline_queue_size} queued`;
