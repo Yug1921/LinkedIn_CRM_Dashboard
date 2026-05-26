@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "GoTeeOff Lead Capture",
+  "version": "1.4",
+  "description": "Capture LinkedIn leads into GoTeeOff CRM automatically while browsing.",
+  "permissions": ["storage", "activeTab", "scripting", "alarms"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": ["https://www.linkedin.com/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GoTeeOff Lead Capture",
+    "default_icon": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}

@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* shadcn/ui required HSL tokens */
+    --background:         220 20% 98%;
+    --foreground:         222 47% 11%;
+    --card:               0 0% 100%;
+    --card-foreground:    222 47% 11%;
+    --popover:            0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary:            158 100% 45%;
+    --primary-foreground: 158 100% 5%;
+    --secondary:          220 16% 94%;
+    --secondary-foreground: 222 47% 11%;
+    --muted:              220 16% 94%;
+    --muted-foreground:   220 10% 46%;
+    --accent:             220 16% 94%;
+    --accent-foreground:  222 47% 11%;
+    --destructive:        346 100% 65%;
+    --destructive-foreground: 0 0% 100%;
+    --border:             220 16% 88%;
+    --input:              220 16% 88%;
+    --ring:               158 100% 45%;
+    --radius:             0.5rem;
+
+    /* GoTeeOff design tokens */
+    --gt-bg:           #09090f;
+    --gt-surface:      #111118;
+    --gt-surface2:     #18181f;
+    --gt-border:       #252530;
+    --gt-accent:       #00e5a0;
+    --gt-accent-dim:   rgba(0,229,160,0.1);
+    --gt-accent-bdr:   rgba(0,229,160,0.25);
+    --accent-dim:      var(--gt-accent-dim);
+    --gt-text:         #e8e8f0;
+    --gt-dim:          #9494b0;
+    --gt-muted:        #55556a;
+
+    /* Category color tokens */
+    --cat-crypto-bg:     rgba(0,229,160,0.1);
+    --cat-crypto-text:   #00e5a0;
+    --cat-blockchain-bg: rgba(83,74,183,0.15);
+    --cat-blockchain-text:#9994e8;
+    --cat-expert-bg:     rgba(24,95,165,0.15);
+    --cat-expert-text:   #4fa3ff;
+    --cat-golf-bg:       rgba(245,166,35,0.15);
+    --cat-golf-text:     #f5a623;
+    --cat-travel-bg:     rgba(212,83,126,0.15);
+    --cat-travel-text:   #D4537E;
+
+    /* Score tokens */
+    --score-low-bg:    rgba(255,77,109,0.12);
+    --score-low-text:  #ff4d6d;
+    --score-mid-bg:    rgba(245,166,35,0.12);
+    --score-mid-text:  #f5a623;
+    --score-high-bg:   rgba(0,229,160,0.12);
+    --score-high-text: #00e5a0;
+
+    /* Status tokens */
+    --status-new-bg:        rgba(79,163,255,0.12);
+    --status-new-text:      #4fa3ff;
+    --status-contacted-bg:  rgba(167,139,250,0.12);
+    --status-contacted-text:#a78bfa;
+    --status-replied-bg:    rgba(0,229,160,0.12);
+    --status-replied-text:  #00e5a0;
+    --status-converted-bg:  rgba(245,166,35,0.12);
+    --status-converted-text:#f5a623;
+    --status-dnc-bg:        rgba(255,77,109,0.12);
+    --status-dnc-text:      #ff4d6d;
+  }
+
+  .dark {
+    --background:         222 47% 4%;
+    --foreground:         220 13% 95%;
+    --card:               222 47% 7%;
+    --card-foreground:    220 13% 95%;
+    --popover:            222 47% 7%;
+    --popover-foreground: 220 13% 95%;
+    --secondary:          220 15% 12%;
+    --secondary-foreground: 220 13% 95%;
+    --muted:              220 15% 12%;
+    --muted-foreground:   220 10% 58%;
+    --accent:             220 15% 12%;
+    --accent-foreground:  220 13% 95%;
+    --border:             222 15% 16%;
+    --input:              222 15% 16%;
+    --accent-dim:         var(--gt-accent-dim);
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar       { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: hsl(var(--background)); }
+  ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .font-mono-num { font-family: 'Space Mono', monospace; }
+
+  /* GoTeeOff utility shorthands */
+  .gt-surface  { background-color: #111118; border: 0.5px solid #252530; border-radius: 10px; }
+  .gt-surface2 { background-color: #18181f; }
+  .gt-accent-text { color: #00e5a0; }
+} 
