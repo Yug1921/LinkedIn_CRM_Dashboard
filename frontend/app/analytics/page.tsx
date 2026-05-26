@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { m } from "framer-motion"
+import type { Variants } from "framer-motion"
 import {
   Area,
   AreaChart,
@@ -30,12 +31,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: "easeOut" },
+    transition: { duration: 0.45, ease: "easeOut" as const },
   },
 }
 

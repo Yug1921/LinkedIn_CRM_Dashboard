@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
+import type { LeadStatus } from "@/types/lead"
 import type { StatsOverview } from "@/types/stats"
 
 const containerVariants: Variants = {
@@ -57,7 +58,7 @@ function buildCategorySeries(data: StatsOverview) {
 
 function buildStatusSeries(data: StatsOverview) {
   return Object.entries(data.by_status).map(([key, value]) => ({
-    status: statusLabel(key),
+    status: statusLabel(key as LeadStatus),
     count: value,
   }))
 }

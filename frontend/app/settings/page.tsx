@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { m } from "framer-motion"
+import type { Variants } from "framer-motion"
 import { useMutation } from "@tanstack/react-query"
 
 import { Button } from "@/components/ui/button"
@@ -13,12 +14,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000"
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: "easeOut" },
+    transition: { duration: 0.45, ease: "easeOut" as const },
   },
 }
 

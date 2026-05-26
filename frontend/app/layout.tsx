@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Inter, Space_Mono } from "next/font/google"
+import { Suspense } from "react"
 import "./globals.css"
 
 import { cn } from "@/lib/utils"
@@ -28,7 +29,9 @@ export default function RootLayout({
           <div className="flex min-h-screen w-full">
             <Sidebar />
             <div className="flex min-h-screen flex-1 flex-col">
-              <TopBarContainer />
+              <Suspense fallback={null}>
+                <TopBarContainer />
+              </Suspense>
               <main className="flex-1">{children}</main>
             </div>
           </div>
