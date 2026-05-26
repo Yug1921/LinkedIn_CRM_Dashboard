@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
 
   const statusSeries = data
     ? Object.entries(data.by_status).map(([key, value]) => ({
-        status: statusLabel(key),
+        status: statusLabel(key as LeadStatus),
         count: value,
       }))
     : []
