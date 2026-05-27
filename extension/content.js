@@ -14,6 +14,11 @@
   if (window.__goteeoff_loaded) return; // guard against duplicate injection
   window.__goteeoff_loaded = true;
 
+  if (typeof chrome === 'undefined' || !chrome.storage) {
+    console.log('[GoTeeOff] Chrome APIs not available, skipping')
+    return
+  }
+
   const LOG = (msg, data) => console.log('[GoTeeOff]', msg, data !== undefined ? data : '');
   LOG('v2.0 loaded:', window.location.href);
 
@@ -50,14 +55,14 @@
       setTimeout(() => detectAndCapture(location.href), 2500)
     }
   })
-  urlObserver.observe(document.querySelector('body'), {
-    childList: true,
-    subtree: true
-  })
+  const bodyEl = document.body || document.querySelector('body')
+  if (bodyEl) {
+    urlObserver.observe(bodyEl, { childList: true, subtree: true })
+  }
 
   // ── Route dispatcher ──
   function detectAndCapture(url) {
-    if (/linkedin\.com\/in\/[a-zA-Z0-9\-]+\/?(\?.*)?$/.test(url)) {
+    if (/linkedin\.com\/in\/[a-zA-Z0-9\-_%]+/.test(url)) {
       captureProfilePage(url)
     }
   }
