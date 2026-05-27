@@ -71,7 +71,6 @@
   // PROFILE PAGE  — max 3 attempts, 2 s / 4 s / 6 s backoff
   // ────────────────────────────────────────────────────────────
   function captureProfilePage(url, attempt = 1) {
-    const MAX = 3;
     function tryGet(sels, ctx = document) {
       for (const s of sels) { try { const t = getText(ctx.querySelector(s)); if (t) return t; } catch (_) { } } return '';
     }
@@ -81,16 +80,22 @@
     // Skip if already captured this URL this session
     if (_captured.has(profileUrl)) { LOG('Profile already captured this session, skipping:', profileUrl); return; }
 
-    const name = tryGet(['h1.text-heading-xlarge', 'h1[class*="heading"]', 'main h1', 'h1']);
+    const name = tryGet([
+      'h1.text-heading-xlarge',
+      'h1[class*="text-heading"]',
+      '.pv-text-details__left-panel h1',
+      'main h1',
+      'h1'
+    ]);
 
     if (!name) {
-      if (attempt < MAX) {
-        LOG(`Profile name not found (attempt ${attempt}/${MAX}), retrying…`);
-        setTimeout(() => captureProfilePage(url, attempt + 1), attempt * 2000);
-      } else {
-        LOG('Profile name not found after max retries — aborting:', url);
-        sendFailure(profileUrl, 'profile_name_not_found');
+      if (attempt < 4) {
+        // DOM not ready yet, retry with increasing delay
+        setTimeout(() => captureProfilePage(url, attempt + 1), attempt * 1000)
+        return
       }
+
+      LOG('Could not extract name after 4 attempts, skipping')
       return;
     }
 

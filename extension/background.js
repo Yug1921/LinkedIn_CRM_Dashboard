@@ -51,16 +51,17 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
 
 // ── Core capture handler ─────────────────────────────────────
 async function handleCapture(data) {
-  const store = await get({
-    enabled: true,
-    daily_scrape_count: 0,
-    selected_category: 'crypto_influencer',
-    api_base: DEFAULT_API_BASE
-  });
+  const { selected_category, api_base, enabled, daily_scrape_count } =
+    await chrome.storage.local.get({
+      selected_category: 'crypto_influencer',
+      api_base: DEFAULT_API_BASE,
+      enabled: true,
+      daily_scrape_count: 0
+    });
 
-  if (!store.enabled) return { status: 'disabled' };
+  if (!enabled) return { status: 'disabled' };
 
-  if (store.daily_scrape_count >= DAILY_LIMIT) {
+  if (daily_scrape_count >= DAILY_LIMIT) {
     await appendActivity({ type: 'rate_limited', name: data.full_name || '', ts: Date.now() });
     notifyPopup({ type: 'RATE_LIMITED' });
     return { status: 'rate_limited' };
@@ -75,16 +76,16 @@ async function handleCapture(data) {
     about:          data.about        || '',
     connections:    data.connections  || '',
     profile_type:   data.profile_type || 'person',
-    category_hint:  store.selected_category,
+    category_hint:  selected_category,
     source:         data.source || 'chrome_extension',
     raw_data:       data
   };
 
-  const result = await postWithRetry(store.api_base, payload);
+  const result = await postWithRetry(api_base, payload);
 
   if (result.ok) {
     const isDup = result.duplicate;
-    const newCount = isDup ? store.daily_scrape_count : store.daily_scrape_count + 1;
+    const newCount = isDup ? daily_scrape_count : daily_scrape_count + 1;
 
     // ── Persist dup_count in storage (not just popup memory) ──
     const { dup_count = 0 } = await get({ dup_count: 0 });
@@ -102,7 +103,7 @@ async function handleCapture(data) {
       type:     isDup ? 'duplicate' : 'success',
       name:     data.full_name || 'LinkedIn Member',
       headline: data.headline || '',
-      category: store.selected_category,
+      category: selected_category,
       url:      data.profile_url,
       ts:       Date.now()
     });
@@ -114,7 +115,7 @@ async function handleCapture(data) {
       count:    newCount,
       name:     data.full_name,
       headline: data.headline || '',
-      category: store.selected_category,
+      category: selected_category,
       status:   isDup ? 'duplicate' : 'success',
       dup_count: isDup ? dup_count + 1 : dup_count
     });
