@@ -14,9 +14,14 @@
   if (window.__goteeoff_loaded) return; // guard against duplicate injection
   window.__goteeoff_loaded = true;
 
-  if (typeof chrome === 'undefined' || !chrome.storage) {
+  if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
     console.log('[GoTeeOff] Chrome APIs not available, skipping')
     return
+  }
+
+  function getStorageLocal() {
+    const local = chrome?.storage?.local
+    return local && typeof local.get === 'function' ? local : null
   }
 
   const LOG = (msg, data) => console.log('[GoTeeOff]', msg, data !== undefined ? data : '');
@@ -29,13 +34,18 @@
   let _enabledCache = null, _enabledAt = 0;
   function isEnabled() {
     if (_enabledCache !== null && Date.now() - _enabledAt < 5000) return Promise.resolve(_enabledCache);
-    return new Promise(r => chrome.storage.local.get({ enabled: true }, d => {
+    const storageLocal = getStorageLocal()
+    if (!storageLocal) return Promise.resolve(true)
+    return new Promise(r => storageLocal.get({ enabled: true }, d => {
       _enabledCache = d.enabled; _enabledAt = Date.now(); r(d.enabled);
     }));
   }
-  chrome.storage.onChanged.addListener(c => {
-    if (c.enabled !== undefined) { _enabledCache = c.enabled.newValue; _enabledAt = Date.now(); }
-  });
+  const storageOnChanged = chrome.storage && chrome.storage.onChanged
+  if (storageOnChanged && typeof storageOnChanged.addListener === 'function') {
+    storageOnChanged.addListener(c => {
+      if (c.enabled !== undefined) { _enabledCache = c.enabled.newValue; _enabledAt = Date.now(); }
+    })
+  }
 
   // ── URL normaliser ──
   function norm(raw) {
