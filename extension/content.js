@@ -38,32 +38,27 @@
     catch (_) { return raw.toLowerCase().split('?')[0].replace(/\/$/, ''); }
   }
 
-  // ── SPA navigation detection ──
-  // Only fires when the normalised path actually changes — ignores query/hash noise.
-  let _lastPath = norm(location.href);
-  let _navTimer = null;
-  setInterval(async () => {
-    const current = norm(location.href);
-    if (current !== _lastPath) {
-      _lastPath = current;
-      if (_navTimer) clearTimeout(_navTimer);
-      _navTimer = setTimeout(async () => {
-        if (await isEnabled()) detectAndCapture(location.href);
-      }, 1800); // wait for LinkedIn SPA to finish rendering
-    }
-  }, 1000);
+  // Fire on initial load
+  setTimeout(() => detectAndCapture(location.href), 3000)
 
-  // ── Initial page load ──
-  setTimeout(async () => {
-    if (await isEnabled()) detectAndCapture(location.href);
-  }, 2500);
+  // Fire on SPA navigation using MutationObserver on the URL
+  let lastUrl = location.href
+  const urlObserver = new MutationObserver(() => {
+    if (location.href !== lastUrl) {
+      lastUrl = location.href
+      // Wait for LinkedIn SPA to finish rendering
+      setTimeout(() => detectAndCapture(location.href), 2500)
+    }
+  })
+  urlObserver.observe(document.querySelector('body'), {
+    childList: true,
+    subtree: true
+  })
 
   // ── Route dispatcher ──
   function detectAndCapture(url) {
-    if (/linkedin\.com\/in\/[^/?]+/.test(url)) { captureProfilePage(url, 1); return; }
-    if (/linkedin\.com\/company\/[^/?]+/.test(url)) { captureCompanyPage(url, 1); return; }
-    if (/linkedin\.com\/search\/results\//.test(url)) {
-      setTimeout(() => captureSearchResults(url, 1), 2000);
+    if (/linkedin\.com\/in\/[a-zA-Z0-9\-]+\/?(\?.*)?$/.test(url)) {
+      captureProfilePage(url)
     }
   }
 
@@ -75,7 +70,7 @@
   // ────────────────────────────────────────────────────────────
   // PROFILE PAGE  — max 3 attempts, 2 s / 4 s / 6 s backoff
   // ────────────────────────────────────────────────────────────
-  function captureProfilePage(url, attempt) {
+  function captureProfilePage(url, attempt = 1) {
     const MAX = 3;
     function tryGet(sels, ctx = document) {
       for (const s of sels) { try { const t = getText(ctx.querySelector(s)); if (t) return t; } catch (_) { } } return '';
@@ -116,7 +111,7 @@
   // ────────────────────────────────────────────────────────────
   // COMPANY PAGE  — max 3 attempts
   // ────────────────────────────────────────────────────────────
-  function captureCompanyPage(url, attempt) {
+  function captureCompanyPage(url, attempt = 1) {
     const MAX = 3;
     function tryGet(sels, ctx = document) {
       for (const s of sels) { try { const t = getText(ctx.querySelector(s)); if (t) return t; } catch (_) { } } return '';
@@ -153,7 +148,7 @@
   // ────────────────────────────────────────────────────────────
   // SEARCH RESULTS — one attempt + one retry only
   // ────────────────────────────────────────────────────────────
-  function captureSearchResults(url, attempt) {
+  function captureSearchResults(url, attempt = 1) {
     const MAX = 2;
     LOG('Scanning search results…');
 

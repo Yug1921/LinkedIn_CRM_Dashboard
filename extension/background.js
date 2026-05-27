@@ -19,7 +19,7 @@
 const LOG = (msg, data) => console.log('[GoTeeOff BG]', msg, data !== undefined ? data : '');
 
 const DAILY_LIMIT = 80;
-const DEFAULT_API_BASE = 'https://linkedin-crm-dashboard.onrender.com/';
+const DEFAULT_API_BASE = 'https://linkedin-crm-dashboard.onrender.com';
 const ENDPOINT = '/api/ingest/linkedin-profile-full';
 const MAX_ACTIVITY = 100; // keep last N events in storage
 

@@ -6,6 +6,7 @@
   "permissions": ["storage", "activeTab", "scripting", "alarms"],
   "host_permissions": [
     "https://www.linkedin.com/*",
+    "https://linkedin-crm-dashboard.onrender.com/*",
     "http://127.0.0.1/*",
     "http://localhost/*"
   ],
