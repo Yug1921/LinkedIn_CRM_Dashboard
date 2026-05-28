@@ -25,14 +25,6 @@ import type { LeadStatus } from "@/types/lead"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 
 const containerVariants: Variants = {
   hidden: { opacity: 0, y: 16 },
@@ -96,13 +88,6 @@ export default function AnalyticsPage() {
     : []
 
   const topLocations = data ? (data.top_locations ?? []).slice(0, 8) : []
-
-  const statusSeries = data
-    ? Object.entries(data.by_status).map(([key, value]) => ({
-        status: statusLabel(key as LeadStatus),
-        count: value,
-      }))
-    : []
 
   return (
     <m.div
