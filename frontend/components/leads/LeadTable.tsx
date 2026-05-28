@@ -254,7 +254,12 @@ export function LeadTable({
           <Button variant="outline" size="sm" onClick={exportCsv}>
             Export CSV
           </Button>
-          <Button variant="default" size="sm" onClick={() => queryClient.invalidateQueries({ queryKey: ["leads"] })}>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ["leads"] })}
+            style={{ backgroundColor: "var(--gt-accent)", color: "hsl(var(--primary-foreground))", borderColor: "var(--gt-accent-bdr)" }}
+          >
             Refresh
           </Button>
         </div>

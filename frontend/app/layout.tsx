@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter, Space_Mono } from "next/font/google"
 import { Suspense } from "react"
+import { ThemeProvider } from "next-themes"
 import "./globals.css"
 
 import { cn } from "@/lib/utils"
@@ -23,20 +24,22 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-bg text-text antialiased", inter.variable, spaceMono.variable)}>
-        <Providers>
-          <div className="flex min-h-screen w-full">
-            <Sidebar />
-            <div className="flex min-h-screen flex-1 flex-col">
-              <Suspense fallback={null}>
-                <TopBarContainer />
-              </Suspense>
-              <main className="flex-1">{children}</main>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+          <Providers>
+            <div className="flex min-h-screen w-full">
+              <Sidebar />
+              <div className="flex min-h-screen flex-1 flex-col">
+                <Suspense fallback={null}>
+                  <TopBarContainer />
+                </Suspense>
+                <main className="flex-1">{children}</main>
+              </div>
             </div>
-          </div>
-          <Toaster position="bottom-right" richColors />
-        </Providers>
+            <Toaster position="bottom-right" richColors />
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   )

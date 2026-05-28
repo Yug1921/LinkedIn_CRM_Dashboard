@@ -238,26 +238,27 @@ export default function DashboardPage() {
                       <AreaChart data={captureSeries} margin={{ left: -8, right: 8 }}>
                         <defs>
                           <linearGradient id="capture" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="var(--gt-accent)" stopOpacity={0.35} />
-                            <stop offset="100%" stopColor="var(--gt-accent)" stopOpacity={0.02} />
+                            <stop offset="0%" stopColor="#16a34a" stopOpacity={0.12} />
+                            <stop offset="100%" stopColor="#16a34a" stopOpacity={0.0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                        <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                        <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#9ca3af" }} stroke="#e5e7eb" />
+                        <YAxis tick={{ fontSize: 12, fill: "#9ca3af" }} stroke="#e5e7eb" />
                         <RechartsTooltip
                           cursor={{ fill: "var(--gt-accent-dim)" }}
                           contentStyle={{
-                            backgroundColor: "hsl(var(--popover))",
-                            border: "1px solid hsl(var(--border))",
-                            color: "hsl(var(--popover-foreground))",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e5e7eb",
+                            color: "#111827",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
                             borderRadius: "10px",
                           }}
                         />
                         <Area
                           type="monotone"
                           dataKey="count"
-                          stroke="var(--gt-accent)"
+                          stroke="#16a34a"
                           fill="url(#capture)"
                           strokeWidth={2}
                         />
@@ -307,18 +308,19 @@ export default function DashboardPage() {
                   ) : mounted ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={categorySeries} margin={{ left: -16, right: 12 }}>
-                        <XAxis dataKey="category" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                        <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                        <XAxis dataKey="category" tick={{ fontSize: 11, fill: "#9ca3af" }} stroke="#e5e7eb" />
+                        <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} stroke="#e5e7eb" />
                         <RechartsTooltip
                           cursor={{ fill: "var(--gt-accent-dim)" }}
                           contentStyle={{
-                            backgroundColor: "hsl(var(--popover))",
-                            border: "1px solid hsl(var(--border))",
-                            color: "hsl(var(--popover-foreground))",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e5e7eb",
+                            color: "#111827",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
                             borderRadius: "10px",
                           }}
                         />
-                        <Bar dataKey="count" fill="var(--gt-accent)" radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="count" fill="#16a34a" radius={[6, 6, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (
@@ -341,18 +343,19 @@ export default function DashboardPage() {
                   ) : mounted ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={statusSeries} margin={{ left: -16, right: 12 }}>
-                        <XAxis dataKey="status" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                        <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                        <XAxis dataKey="status" tick={{ fontSize: 11, fill: "#9ca3af" }} stroke="#e5e7eb" />
+                        <YAxis tick={{ fontSize: 11, fill: "#9ca3af" }} stroke="#e5e7eb" />
                         <RechartsTooltip
                           cursor={{ fill: "var(--gt-accent-dim)" }}
                           contentStyle={{
-                            backgroundColor: "hsl(var(--popover))",
-                            border: "1px solid hsl(var(--border))",
-                            color: "hsl(var(--popover-foreground))",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #e5e7eb",
+                            color: "#111827",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
                             borderRadius: "10px",
                           }}
                         />
-                        <Bar dataKey="count" fill="var(--gt-accent)" radius={[6, 6, 0, 0]} />
+                        <Bar dataKey="count" fill="#16a34a" radius={[6, 6, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   ) : (

@@ -4,98 +4,93 @@
 
 @layer base {
   :root {
-    /* shadcn/ui required HSL tokens */
-    --background:         220 20% 98%;
-    --foreground:         222 47% 11%;
-    --card:               0 0% 100%;
-    --card-foreground:    222 47% 11%;
-    --popover:            0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary:            158 100% 45%;
-    --primary-foreground: 158 100% 5%;
-    --secondary:          220 16% 94%;
-    --secondary-foreground: 222 47% 11%;
-    --muted:              220 16% 94%;
-    --muted-foreground:   220 10% 46%;
-    --accent:             220 16% 94%;
-    --accent-foreground:  222 47% 11%;
-    --destructive:        346 100% 65%;
-    --destructive-foreground: 0 0% 100%;
-    --border:             220 16% 88%;
-    --input:              220 16% 88%;
-    --ring:               158 100% 45%;
-    --radius:             0.5rem;
+    /* Core shadcn tokens */
+    --background: 0 0% 98%;
+    --foreground: 222 47% 7%;
 
-    /* GoTeeOff design tokens */
-    --gt-bg:           #09090f;
-    --gt-surface:      #111118;
-    --gt-surface2:     #18181f;
-    --gt-border:       #252530;
-    --gt-accent:       #00e5a0;
-    --gt-accent-dim:   rgba(0,229,160,0.1);
-    --gt-accent-bdr:   rgba(0,229,160,0.25);
-    --accent-dim:      var(--gt-accent-dim);
-    --gt-text:         #e8e8f0;
-    --gt-dim:          #9494b0;
-    --gt-muted:        #55556a;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 7%;
 
-    /* Category color tokens */
-    --cat-crypto-bg:     rgba(0,229,160,0.1);
-    --cat-crypto-text:   #00e5a0;
-    --cat-blockchain-bg: rgba(83,74,183,0.15);
-    --cat-blockchain-text:#9994e8;
-    --cat-expert-bg:     rgba(24,95,165,0.15);
-    --cat-expert-text:   #4fa3ff;
-    --cat-golf-bg:       rgba(245,166,35,0.15);
-    --cat-golf-text:     #f5a623;
-    --cat-travel-bg:     rgba(212,83,126,0.15);
-    --cat-travel-text:   #D4537E;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 7%;
 
-    /* Score tokens */
-    --score-low-bg:    rgba(255,77,109,0.12);
-    --score-low-text:  #ff4d6d;
-    --score-mid-bg:    rgba(245,166,35,0.12);
-    --score-mid-text:  #f5a623;
-    --score-high-bg:   rgba(0,229,160,0.12);
-    --score-high-text: #00e5a0;
+    --primary: 142 72% 29%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Status tokens */
-    --status-new-bg:        rgba(79,163,255,0.12);
-    --status-new-text:      #4fa3ff;
-    --status-contacted-bg:  rgba(167,139,250,0.12);
-    --status-contacted-text:#a78bfa;
-    --status-replied-bg:    rgba(0,229,160,0.12);
-    --status-replied-text:  #00e5a0;
-    --status-converted-bg:  rgba(245,166,35,0.12);
-    --status-converted-text:#f5a623;
-    --status-dnc-bg:        rgba(255,77,109,0.12);
-    --status-dnc-text:      #ff4d6d;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 7%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 142 72% 29%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 346 100% 65%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 142 72% 29%;
+
+    /* GoTeeOff tokens */
+    --gt-bg: #f9fafb;
+    --gt-surface: #ffffff;
+    --gt-surface2: #f3f4f6;
+    --gt-border: #e5e7eb;
+
+    --gt-accent: #16a34a;
+    --gt-accent-dim: rgba(22, 163, 74, 0.08);
+    --gt-accent-bdr: rgba(22, 163, 74, 0.2);
+
+    --gt-text: #111827;
+    --gt-dim: #4b5563;
+    --gt-muted: #9ca3af;
   }
 
   .dark {
-    --background:         222 47% 4%;
-    --foreground:         220 13% 95%;
-    --card:               222 47% 7%;
-    --card-foreground:    220 13% 95%;
-    --popover:            222 47% 7%;
-    --popover-foreground: 220 13% 95%;
-    --secondary:          220 15% 12%;
-    --secondary-foreground: 220 13% 95%;
-    --muted:              220 15% 12%;
-    --muted-foreground:   220 10% 58%;
-    --accent:             220 15% 12%;
-    --accent-foreground:  220 13% 95%;
-    --border:             222 15% 16%;
-    --input:              222 15% 16%;
-    --accent-dim:         var(--gt-accent-dim);
-  }
+    --background: 0 0% 6%;
+    --foreground: 0 0% 100%;
 
-  html {
-    color-scheme: light;
-  }
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
 
-  html.dark {
-    color-scheme: dark;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 160 100% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 11%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 11%;
+    --muted-foreground: 0 0% 63%;
+
+    --accent: 160 100% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 160 100% 45%;
+
+    --gt-bg: #0d0d0d;
+    --gt-surface: #141414;
+    --gt-surface2: #1c1c1c;
+    --gt-border: #2a2a2a;
+
+    --gt-accent: #16a34a;
+    --gt-accent-dim: rgba(22, 163, 74, 0.08);
+    --gt-accent-bdr: rgba(22, 163, 74, 0.18);
+
+    /* Category color variables (used for borders/visuals) */
+    --cat-golf_brand-text: #16a34a;
+    --cat-golf_brand-bg: rgba(22,163,74,0.08);
+    --cat-travel-text: #0ea5a4;
+    --cat-travel-bg: rgba(14,165,164,0.08);
+
+    --gt-text: #ffffff;
+    --gt-dim: #a1a1aa;
+    --gt-muted: #52525b;
   }
 
   * {
@@ -103,34 +98,120 @@
     box-sizing: border-box;
   }
 
-  html, body {
+  html,
+  body {
     height: 100%;
     margin: 0;
   }
 
+  html.light {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--gt-bg);
+    color: var(--gt-text);
+
+    font-family: "Inter", system-ui, sans-serif;
     font-size: 13px;
     line-height: 1.5;
+
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Scrollbar styling */
-  ::-webkit-scrollbar       { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: hsl(var(--background)); }
-  ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+  .card,
+  [data-slot="card"] {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.06),
+      0 1px 2px rgba(0, 0, 0, 0.04);
+
+    border: 1px solid var(--gt-border);
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
 }
 
 @layer utilities {
-  .text-balance { text-wrap: balance; }
-  .font-mono-num { font-family: 'Space Mono', monospace; }
+  .text-balance {
+    text-wrap: balance;
+  }
 
-  /* GoTeeOff utility shorthands */
-  .gt-surface  { background-color: #111118; border: 0.5px solid #252530; border-radius: 10px; }
-  .gt-surface2 { background-color: #18181f; }
-  .gt-accent-text { color: #00e5a0; }
-} 
+  .font-mono-num {
+    font-family: "Space Mono", monospace;
+  }
+
+  .gt-surface {
+    background-color: #111118;
+    border: 0.5px solid #252530;
+    border-radius: 10px;
+  }
+
+  .gt-surface2 {
+    background-color: #18181f;
+  }
+
+  .gt-accent-text {
+    color: #00e5a0;
+  }
+
+  /* Sidebar prominence styles */
+  aside.sidebar {
+    transition: width 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, background-color 220ms ease;
+    will-change: width, box-shadow;
+  }
+
+  aside.sidebar[data-expanded="false"] {
+    box-shadow: 2px 0 8px rgba(0,0,0,0.55);
+  }
+
+  .nav-link {
+    transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+  }
+
+  .nav-link[data-active="true"] {
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--gt-accent-bdr);
+    transform: translateX(2px);
+  }
+
+  .nav-link:hover {
+    transform: translateX(2px);
+  }
+
+  /* When sidebar is collapsed, show active state as an icon-only pill */
+  aside.sidebar[data-expanded="false"] .nav-link[data-active="true"] {
+    background: transparent !important;
+    color: var(--gt-dim) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  aside.sidebar[data-expanded="false"] .nav-link[data-active="true"] svg {
+    background: var(--gt-accent);
+    padding: 6px;
+    border-radius: 8px;
+    color: hsl(var(--primary-foreground));
+  }
+}
+

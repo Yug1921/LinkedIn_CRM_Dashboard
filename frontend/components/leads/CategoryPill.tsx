@@ -11,6 +11,8 @@ const CATEGORY_MAP: Record<string, { label: string; bg: string; text: string; bo
   blockchain_expert: { label: "🔐 Blockchain Expert", bg: "#185FA520", text: "#4fa3ff", border: "#185FA530" },
   golf_user_org: { label: "⛳ Golf", bg: "#f5a62320", text: "#f5a623", border: "#f5a62330" },
   travel_user_org: { label: "✈️ Travel", bg: "#D4537E20", text: "#D4537E", border: "#D4537E30" },
+  golf_brand: { label: "⛳ Golf", bg: "#163f1220", text: "#16a34a", border: "#163f1230" },
+  travel: { label: "✈️ Travel", bg: "#0ea5a420", text: "#0ea5a4", border: "#0ea5a430" },
 }
 
 export function CategoryPill({ category, categoryHint }: Props) {

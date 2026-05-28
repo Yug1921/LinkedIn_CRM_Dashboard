@@ -24,7 +24,7 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
   const [searchValue, setSearchValue] = React.useState(searchParams.get("search") ?? "")
   const [mounted, setMounted] = React.useState(false)
   const debouncedSearch = useDebounce(searchValue, 300)
-  const { resolvedTheme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const isLeads = pathname === "/leads"
 
   React.useEffect(() => {
@@ -59,11 +59,11 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
   }, [debouncedSearch, isLeads, pathname, router, searchParams])
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+    setTheme(theme === "dark" ? "light" : "dark")
   }
 
   return (
-    <div className="flex w-full items-center justify-between border-b border-border bg-surface px-6 py-4">
+    <div className="flex w-full items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--gt-surface)", borderBottom: "1px solid var(--gt-border)" }}>
       <div className="flex items-center gap-4">
         <div>
           <div className="text-xs uppercase tracking-[0.6px] text-text-muted">{titles[pathname] ?? ""}</div>
@@ -71,15 +71,17 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
         </div>
         {isLeads ? (
           <div className="hidden w-[320px] lg:block">
-            <InputGroup>
+            <InputGroup style={{ backgroundColor: "var(--gt-bg)", border: "1px solid var(--gt-border)" }}>
               <InputGroupAddon>
-                <Search className="size-4" />
+                <Search className="size-4" style={{ color: "var(--gt-muted)" }} />
               </InputGroupAddon>
               <InputGroupInput
+                style={{ color: "var(--gt-text)" }}
                 value={searchValue}
                 onChange={(event) => setSearchValue(event.target.value)}
                 placeholder="Search leads..."
                 aria-label="Search leads"
+                className="bg-transparent placeholder:text-[#9ca3af]"
               />
             </InputGroup>
           </div>
@@ -87,15 +89,21 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+          <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          className="bg-transparent p-0 text-[var(--gt-dim)] hover:bg-transparent hover:text-text"
+        >
           {mounted ? (
-            resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />
+            theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />
           ) : (
             <Moon className="size-4" />
           )}
         </Button>
         <div className="relative">
-          <Button variant="ghost" size="icon" aria-label="Notifications">
+          <Button variant="ghost" size="icon" aria-label="Notifications" className="bg-transparent p-0 text-[var(--gt-dim)] hover:bg-transparent hover:text-text">
             <Bell className="size-4" />
           </Button>
           {capturedToday > 0 ? (
@@ -104,8 +112,8 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
             </div>
           ) : null}
         </div>
-        <Avatar>
-          <AvatarFallback className="bg-[var(--accent-dim)] text-[var(--gt-accent)]">GT</AvatarFallback>
+        <Avatar style={{ backgroundColor: "var(--gt-accent)" }}>
+          <AvatarFallback className="bg-[var(--accent-dim)]" style={{ backgroundColor: "var(--gt-accent)", color: "hsl(var(--primary-foreground))" }}>GT</AvatarFallback>
         </Avatar>
       </div>
     </div>

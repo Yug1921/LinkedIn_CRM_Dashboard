@@ -19,6 +19,7 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname()
   const [expanded, setExpanded] = React.useState(true)
+  
 
   React.useEffect(() => {
     const stored = window.localStorage.getItem("sidebar_expanded")
@@ -35,13 +36,18 @@ export function Sidebar() {
     })
   }
 
+  
+
   return (
     <m.aside
       layout
       initial={false}
-      animate={{ width: expanded ? 220 : 52 }}
+      animate={{ width: expanded ? 240 : 64 }}
       transition={{ type: "spring", stiffness: 220, damping: 24 }}
-      className="hidden min-h-screen flex-col border-r border-border bg-surface p-4 lg:flex"
+      data-expanded={expanded}
+      className="hidden min-h-screen flex-col p-4 lg:flex sidebar"
+      style={{ backgroundColor: "var(--gt-surface)", borderRight: "1px solid var(--gt-border)", boxShadow: "2px 0 12px rgba(0,0,0,0.6)" }}
+      
     >
       <div className={cn("flex items-center", expanded ? "justify-start" : "justify-center")}>
         <div className={cn("flex items-center", expanded ? "gap-2" : "gap-0")}>
@@ -50,15 +56,21 @@ export function Sidebar() {
           </div>
           {expanded ? (
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-text">GoTeeOff</span>
+              <span className="text-sm font-semibold" style={{ color: "var(--gt-accent)" }}>GoTeeOff</span>
               <span className="text-[11px] uppercase tracking-[0.6px] text-text-muted">CRM</span>
             </div>
           ) : null}
+          {/* top toggle for quick access */}
+          <div className="ml-auto">
+            <Button variant="ghost" size="icon" onClick={toggle} aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}>
+              {expanded ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+            </Button>
+          </div>
         </div>
       </div>
 
       <nav className="mt-8 flex flex-1 flex-col gap-2">
-        {navItems.map((item) => {
+          {navItems.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
           return (
@@ -66,11 +78,16 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-text-muted transition-colors",
-                isActive && "border-l-2 border-[var(--gt-accent)] bg-[var(--accent-dim)] text-text",
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors nav-link",
                 !expanded && "justify-center px-2",
-                !isActive && "hover:bg-surface2 hover:text-text"
+                !isActive && "hover:bg-[var(--gt-surface2)]"
               )}
+              data-active={isActive}
+              style={{
+                backgroundColor: isActive ? "var(--gt-accent)" : "transparent",
+                borderLeft: "none",
+                color: isActive ? "hsl(var(--primary-foreground))" : "var(--gt-dim)",
+              }}
             >
               <Icon className="size-4" />
               {expanded ? <span className="text-[13px] font-medium">{item.label}</span> : null}
