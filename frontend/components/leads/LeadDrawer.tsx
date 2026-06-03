@@ -3,7 +3,7 @@
 import * as React from "react"
 import { m as motion, AnimatePresence } from "framer-motion"
 import { Loader2, SendHorizonal, X } from "lucide-react"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import { api } from "@/lib/api"
@@ -31,6 +31,23 @@ type OverviewStatusOption = "new" | "contacted" | "replied" | "converted" | "do_
 type SaveState = "idle" | "saving" | "saved"
 type GenerateState = "idle" | "loading" | "error"
 type SendState = "idle" | "sending" | "sent"
+type ManualOutreachType = "connection_request" | "direct_message" | "follow_up" | "email" | "inmail"
+
+const MANUAL_OUTREACH_TYPES: Array<{ value: ManualOutreachType; label: string }> = [
+  { value: "connection_request", label: "Connection Request" },
+  { value: "direct_message", label: "Direct Message" },
+  { value: "follow_up", label: "Follow-up" },
+  { value: "email", label: "Email" },
+  { value: "inmail", label: "InMail" },
+]
+
+const OUTREACH_TYPE_LABELS: Record<string, string> = {
+  connection_request: "Connection Request",
+  direct_message: "Direct Message",
+  follow_up: "Follow-up",
+  email: "Email",
+  inmail: "InMail",
+}
 
 const CATEGORY_TONES: Record<string, { background: string; color: string }> = {
   crypto_influencer: { background: "#1D9E7520", color: "#00e5a0" },
@@ -112,15 +129,19 @@ function getLeadNote(lead: Lead | null): string | null {
 }
 
 function getStatusDotColor(status: string) {
-  if (status === "sent") {
-    return "bg-emerald-400"
+  if (status === "sent" || status === "contacted") {
+    return "bg-accent"
   }
 
   if (status === "replied") {
-    return "bg-violet-400"
+    return "bg-[#4fa3ff]"
   }
 
-  return "bg-[#55556a]"
+  if (status === "bounced") {
+    return "bg-[#ff4d6d]"
+  }
+
+  return "bg-gt-muted"
 }
 
 function formatPreview(entry: OutreachLog) {
@@ -129,7 +150,55 @@ function formatPreview(entry: OutreachLog) {
     return "No message body"
   }
 
-  return text.length > 100 ? `${text.slice(0, 100).trimEnd()}...` : text
+  return text.length > 120 ? `${text.slice(0, 120).trimEnd()}...` : text
+}
+
+function getOutreachTypeLabel(type?: string | null) {
+  if (!type) {
+    return "Unknown"
+  }
+
+  return OUTREACH_TYPE_LABELS[type] ?? type.replace(/_/g, " ")
+}
+
+function getOutreachStatusBadgeProps(status: string): {
+  variant: React.ComponentProps<typeof Badge>["variant"]
+  className: string
+} {
+  if (status === "sent" || status === "contacted") {
+    return {
+      variant: "status-contacted",
+      className: "h-5 border border-transparent px-2 py-0.5 text-[10px] font-medium",
+    }
+  }
+
+  if (status === "replied") {
+    return {
+      variant: "status-replied",
+      className: "h-5 border border-transparent px-2 py-0.5 text-[10px] font-medium",
+    }
+  }
+
+  if (status === "bounced") {
+    return {
+      variant: "destructive",
+      className: "h-5 border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-rose-500",
+    }
+  }
+
+  return {
+    variant: "outline",
+    className: "h-5 border-border bg-surface2 px-2 py-0.5 text-[10px] font-medium text-gt-dim",
+  }
+}
+
+function formatStatusLabel(status: string) {
+  return status
+    .replace(/[_-]+/g, " ")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ")
 }
 
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -190,25 +259,32 @@ function ToggleButton({
 }
 
 function TimelineItem({ entry, isLast }: { entry: OutreachLog; isLast: boolean }) {
+  const statusBadgeProps = getOutreachStatusBadgeProps(entry.status)
+
   return (
     <div className="flex gap-3">
-      <div className="flex w-4 flex-col items-center pt-1">
-        <span className={cn("size-2.5 rounded-full", getStatusDotColor(entry.status))} />
-        {!isLast ? <span className="mt-1 h-full w-px flex-1 bg-white/10" /> : null}
+      <div className="flex w-4 flex-col items-center py-1">
+        <span className={cn("size-2 rounded-full", getStatusDotColor(entry.status))} />
+        {!isLast ? <span className="mt-1 h-full w-0.5 flex-1 bg-border" /> : null}
       </div>
       <div className="flex-1 pb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="border-white/10 bg-white/[0.03] text-[11px] uppercase tracking-[0.08em] text-[#c8c8d9]">
-            {entry.outreach_type ?? "unknown"}
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="border-border bg-surface2 px-2 py-0.5 text-[10px] font-medium text-gt-dim">
+            {getOutreachTypeLabel(entry.outreach_type)}
           </Badge>
           {entry.ai_generated ? (
-            <Badge variant="outline" className="border-[#00e5a030] bg-[#00e5a020] text-[#00e5a0]">
+            <Badge variant="outline" className="border-[#00e5a030] bg-[#00e5a020] px-2 py-0.5 text-[10px] font-medium text-[#00e5a0]">
               AI
             </Badge>
           ) : null}
-          <span className="text-xs text-[#9494b0]">{timeAgo(entry.sent_at ?? entry.created_at)}</span>
+          <span className="ml-auto text-xs text-gt-dim">{timeAgo(entry.sent_at ?? entry.created_at)}</span>
         </div>
-        <div className="mt-2 text-sm leading-6 text-white/85">{formatPreview(entry)}</div>
+        <div className="mt-2 text-xs leading-5 text-gt-dim">{formatPreview(entry)}</div>
+        <div className="mt-2">
+          <Badge variant={statusBadgeProps.variant} className={statusBadgeProps.className}>
+            {formatStatusLabel(entry.status)}
+          </Badge>
+        </div>
       </div>
     </div>
   )
@@ -229,6 +305,10 @@ export function LeadDrawer({ lead, onClose, onStatusChange }: LeadDrawerProps) {
   const [hasGeneratedDraft, setHasGeneratedDraft] = React.useState(false)
   const [copyState, setCopyState] = React.useState(false)
   const [sendState, setSendState] = React.useState<SendState>("idle")
+  const [manualOutreachOpen, setManualOutreachOpen] = React.useState(false)
+  const [manualOutreachType, setManualOutreachType] = React.useState<ManualOutreachType>("connection_request")
+  const [manualOutreachMessage, setManualOutreachMessage] = React.useState("")
+  const [manualOutreachError, setManualOutreachError] = React.useState<string | null>(null)
   const saveTimeoutRef = React.useRef<number | null>(null)
   const copyTimeoutRef = React.useRef<number | null>(null)
   const sendTimeoutRef = React.useRef<number | null>(null)
@@ -244,12 +324,52 @@ export function LeadDrawer({ lead, onClose, onStatusChange }: LeadDrawerProps) {
   const currentMaxLength = MAX_LENGTHS[outreachType]
 
   const {
-    data: outreachLogs,
-    isLoading: isOutreachLoading,
+    data: logs,
+    isLoading,
+    isError,
+    refetch,
   } = useQuery({
-    queryKey: ["outreach", leadId],
-    enabled: Boolean(leadId),
-    queryFn: () => api.getOutreachLogs(leadId),
+    queryKey: ["outreach", lead?.id],
+    queryFn: () => api.getOutreachLogs(lead!.id),
+    enabled: !!lead?.id && activeTab === "history",
+    staleTime: 30_000,
+  })
+
+  const createManualOutreach = useMutation({
+    mutationFn: async (payload: {
+      outreach_type: ManualOutreachType
+      message_body: string | null
+      ai_generated: false
+      status: "sent"
+      channel: "linkedin"
+    }) => {
+      if (!lead?.id) {
+        throw new Error("Missing lead id")
+      }
+
+      const response = await fetch(`${api.baseUrl}/api/leads/${lead.id}/outreach`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const message = await response.text()
+        throw new Error(message || "Failed to save outreach log")
+      }
+    },
+    onSuccess: () => {
+      setManualOutreachOpen(false)
+      setManualOutreachMessage("")
+      setManualOutreachType("connection_request")
+      setManualOutreachError(null)
+      void refetch()
+    },
+    onError: (error) => {
+      setManualOutreachError(error instanceof Error ? error.message : "Failed to save outreach log")
+    },
   })
 
   React.useEffect(() => {
@@ -323,6 +443,10 @@ export function LeadDrawer({ lead, onClose, onStatusChange }: LeadDrawerProps) {
     setHasGeneratedDraft(false)
     setCopyState(false)
     setSendState("idle")
+    setManualOutreachOpen(false)
+    setManualOutreachType("connection_request")
+    setManualOutreachMessage("")
+    setManualOutreachError(null)
 
     if (saveTimeoutRef.current) {
       window.clearTimeout(saveTimeoutRef.current)
@@ -606,38 +730,121 @@ export function LeadDrawer({ lead, onClose, onStatusChange }: LeadDrawerProps) {
                     Outreach history
                   </div>
 
-                  {isOutreachLoading ? (
+                  {isLoading ? (
                     <div className="mt-4 space-y-4">
                       {Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="flex gap-3">
-                          <div className="flex w-4 flex-col items-center pt-1">
-                            <Skeleton className="size-2.5 rounded-full bg-white/15" />
-                            {index < 2 ? <span className="mt-1 h-full w-px flex-1 bg-white/10" /> : null}
-                          </div>
-                          <div className="flex-1 space-y-2 pb-4">
-                            <Skeleton className="h-4 w-36" />
-                            <Skeleton className="h-3 w-full" />
-                            <Skeleton className="h-3 w-3/4" />
+                        <div key={index} className="flex items-start gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+                          <Skeleton className="size-8 rounded-full bg-white/15" />
+                          <div className="flex-1 space-y-2 pt-0.5">
+                            <Skeleton className="h-3.5 w-32 bg-white/15" />
+                            <Skeleton className="h-3 w-4/5 bg-white/10" />
                           </div>
                         </div>
                       ))}
                     </div>
-                  ) : outreachLogs?.length ? (
+                  ) : isError ? (
+                    <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface2 px-4 py-3">
+                      <div className="text-xs text-gt-dim">Could not load outreach history</div>
+                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => void refetch()}>
+                        Retry
+                      </Button>
+                    </div>
+                  ) : logs?.length ? (
                     <div className="mt-4">
-                      {outreachLogs.map((entry, index) => (
+                      {logs.map((entry, index) => (
                         <TimelineItem
                           key={entry.id}
                           entry={entry}
-                          isLast={index === outreachLogs.length - 1}
+                          isLast={index === logs.length - 1}
                         />
                       ))}
                     </div>
                   ) : (
-                    <div className="mt-4 flex items-center gap-2 text-sm text-[#9494b0]">
-                      <SendHorizonal className="size-4 text-[#55556a]" />
-                      <span>No outreach logged yet.</span>
+                    <div className="mt-6 flex flex-col items-center justify-center gap-2 py-8 text-center text-gt-dim">
+                      <SendHorizonal className="size-4 text-gt-muted" />
+                      <div className="text-sm text-gt-dim">No outreach logged yet</div>
+                      <div className="max-w-64 text-xs text-gt-dim">
+                        Generate and send a draft from the AI Draft tab to log activity here.
+                      </div>
                     </div>
                   )}
+
+                  <div className="mt-4 space-y-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-8 w-full border-border bg-transparent text-xs text-gt-dim hover:bg-surface2 hover:text-foreground"
+                      onClick={() => {
+                        setManualOutreachOpen(true)
+                        setManualOutreachError(null)
+                      }}
+                    >
+                      + Log manual outreach
+                    </Button>
+
+                    {manualOutreachOpen ? (
+                      <div className="space-y-3 rounded-2xl border border-border bg-surface2 p-3">
+                        <Select
+                          value={manualOutreachType}
+                          onValueChange={(value) => setManualOutreachType(value as ManualOutreachType)}
+                        >
+                          <SelectTrigger className="h-8 border-border bg-background text-xs text-foreground">
+                            <SelectValue placeholder="Outreach type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {MANUAL_OUTREACH_TYPES.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Textarea
+                          value={manualOutreachMessage}
+                          onChange={(event) => setManualOutreachMessage(event.target.value)}
+                          rows={3}
+                          placeholder="Optional message body"
+                          className="border-border bg-background text-sm text-foreground placeholder:text-gt-muted"
+                        />
+
+                        {manualOutreachError ? (
+                          <div className="text-xs text-rose-500">{manualOutreachError}</div>
+                        ) : null}
+
+                        <div className="flex items-center gap-3">
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="h-8 px-3 text-xs"
+                            disabled={createManualOutreach.isPending}
+                            onClick={() => {
+                              setManualOutreachError(null)
+                              createManualOutreach.mutate({
+                                outreach_type: manualOutreachType,
+                                message_body: manualOutreachMessage.trim() ? manualOutreachMessage.trim() : null,
+                                ai_generated: false,
+                                status: "sent",
+                                channel: "linkedin",
+                              })
+                            }}
+                          >
+                            Save
+                          </Button>
+                          <button
+                            type="button"
+                            className="text-xs text-gt-dim underline underline-offset-4 hover:text-foreground"
+                            onClick={() => {
+                              setManualOutreachOpen(false)
+                              setManualOutreachError(null)
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               ) : null}
 
