@@ -35,6 +35,20 @@ const containerVariants: Variants = {
   },
 }
 
+function formatRegionName(region?: string | null) {
+  const value = (region ?? "").trim()
+  if (!value) return "-"
+  if (/^[a-z]{2,3}$/i.test(value)) {
+    try {
+      const displayNames = new Intl.DisplayNames(["en"], { type: "region" })
+      return displayNames.of(value.toUpperCase()) ?? value.toUpperCase()
+    } catch {
+      return value.toUpperCase()
+    }
+  }
+  return value
+}
+
 export default function AnalyticsPage() {
   const [mounted, setMounted] = React.useState(false)
   const { data, isLoading, isError, refetch } = useQuery({
@@ -131,7 +145,7 @@ export default function AnalyticsPage() {
                           <stop offset="100%" stopColor={`hsl(var(--accent))`} stopOpacity={0.02} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--gt-border)" />
+                      {/* no grid */}
                       <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--gt-text)" }} axisLine={false} tickLine={false} />
                       <YAxis tick={{ fontSize: 12, fill: "var(--gt-text)" }} axisLine={false} tickLine={false} />
                       <RechartsTooltip cursor={{ fill: "var(--gt-accent-dim)" }} contentStyle={{ backgroundColor: "var(--gt-surface)", border: "1px solid var(--gt-border)", color: "var(--gt-text)" }} />
@@ -163,7 +177,7 @@ export default function AnalyticsPage() {
                 ) : mounted ? (
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart layout="vertical" data={categorySeries} margin={{ left: 0, right: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--gt-border)" />
+                      {/* no grid */}
                       <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--gt-text)" }} />
                       <YAxis width={100} type="category" dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--gt-text)", dy: 6 }} />
                       <RechartsTooltip cursor={{ fill: "var(--gt-accent-dim)" }} contentStyle={{ backgroundColor: "var(--gt-surface)", border: "1px solid var(--gt-border)", color: "var(--gt-text)" }} />
@@ -212,7 +226,7 @@ export default function AnalyticsPage() {
                 ) : mounted ? (
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={statusSeriesOrdered} margin={{ left: 0, right: 8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--gt-border)" />
+                      {/* no grid */}
                       <XAxis dataKey="status" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--gt-text)" }} />
                       <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--gt-text)" }} />
                       <RechartsTooltip cursor={{ fill: "var(--gt-accent-dim)" }} contentStyle={{ backgroundColor: "var(--gt-surface)", border: "1px solid var(--gt-border)", color: "var(--gt-text)" }} />
@@ -252,10 +266,7 @@ export default function AnalyticsPage() {
                       return topLocations.map((loc, idx) => {
                         const pct = Math.round((loc.count / max) * 100)
                         const opacity = Math.max(0.18, 0.9 - idx * 0.1)
-                        const countryMap: Record<string, string> = {
-                          IN: "India",
-                        }
-                        const display = countryMap[String(loc.location).toUpperCase()] ?? loc.location
+                        const display = formatRegionName(String(loc.location ?? ""))
                         return (
                           <div key={loc.location} className="flex items-center gap-3">
                             <div className="w-40 text-sm text-text">{display}</div>

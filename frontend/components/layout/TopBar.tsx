@@ -66,7 +66,6 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
     <div className="flex w-full items-center justify-between px-6 py-4" style={{ backgroundColor: "var(--gt-surface)", borderBottom: "1px solid var(--gt-border)" }}>
       <div className="flex items-center gap-4">
         <div>
-          <div className="text-xs uppercase tracking-[0.6px] text-text-muted">{titles[pathname] ?? ""}</div>
           <div className="text-lg font-semibold text-text">{titles[pathname] ?? ""}</div>
         </div>
         {isLeads ? (
