@@ -9,7 +9,6 @@ import {
   AreaChart,
   Bar,
   BarChart,
-  CartesianGrid,
   Cell,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
@@ -50,11 +49,11 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  New:         "#4fa3ff",
-  Contacted:   "#a78bfa",
-  Replied:     "#00e5a0",
-  Qualified:   "#f5a623",
-  Engaged:     "#00bcd4",
+  New: "#4fa3ff",
+  Contacted: "#a78bfa",
+  Replied: "#00e5a0",
+  Qualified: "#f5a623",
+  Engaged: "#00bcd4",
   Unqualified: "#444",
 }
 
@@ -72,6 +71,63 @@ function formatRegionName(region?: string | null) {
   return value
 }
 
+interface CaptureTimelinePoint {
+  date: string
+  fullDate: string
+  count: number
+  tickLabel: string
+  isMajorTick: boolean
+}
+
+interface CategorySeriesPoint {
+  key: string
+  category: string
+  count: number
+  color: string
+}
+
+interface StatusSeriesPoint {
+  key: string
+  status: string
+  count: number
+  color: string
+}
+
+interface DarkTooltipItem {
+  value?: number | string
+  payload?: CaptureTimelinePoint
+}
+
+interface DarkTooltipProps {
+  active?: boolean
+  payload?: DarkTooltipItem[]
+  label?: string | number
+}
+
+interface BarTipItem {
+  value?: number | string
+}
+
+interface BarTipProps {
+  active?: boolean
+  payload?: BarTipItem[]
+  label?: string | number
+}
+
+interface CaptureAxisTickProps {
+  x?: number
+  y?: number
+  payload?: {
+    payload?: Pick<CaptureTimelinePoint, "tickLabel" | "isMajorTick">
+  }
+}
+
+interface CategoryAxisTickProps {
+  x?: number
+  y?: number
+  payload?: { value?: string | number }
+}
+
 // ─── animation variants ───────────────────────────────────────────────────────
 const containerVariants: Variants = {
   hidden:  { opacity: 0, y: 18 },
@@ -87,7 +143,7 @@ const cardVariants: Variants = {
 }
 
 // ─── data builders ────────────────────────────────────────────────────────────
-function buildCaptureTimeline(leads: Array<{ created_at: string }>) {
+function buildCaptureTimeline(leads: Array<{ created_at: string }>): CaptureTimelinePoint[] {
   if (leads.length === 0) return []
   const dayCounts = new Map<string, number>()
   let firstDay: Date | null = null
@@ -104,7 +160,7 @@ function buildCaptureTimeline(leads: Array<{ created_at: string }>) {
   }
 
   if (!firstDay || !lastDay) return []
-  const timeline: Array<{ date: string; fullDate: string; count: number; tickLabel: string; isMajorTick: boolean }> = []
+  const timeline: CaptureTimelinePoint[] = []
   const cursor = new Date(firstDay)
   let index = 0
 
@@ -125,7 +181,7 @@ function buildCaptureTimeline(leads: Array<{ created_at: string }>) {
   return timeline
 }
 
-async function fetchAllLeadCaptureTimeline() {
+async function fetchAllLeadCaptureTimeline(): Promise<CaptureTimelinePoint[]> {
   const pageSize = 100; let offset = 0; let total = Infinity
   const leads: Array<{ created_at: string }> = []
   while (offset < total) {
@@ -136,7 +192,7 @@ async function fetchAllLeadCaptureTimeline() {
   return buildCaptureTimeline(leads)
 }
 
-function toCategorySeries(d: StatsOverview) {
+function toCategorySeries(d: StatsOverview): CategorySeriesPoint[] {
   return Object.entries(d.by_category)
     .map(([k, v]) => ({
       key: k,
@@ -148,16 +204,17 @@ function toCategorySeries(d: StatsOverview) {
     .sort((a, b) => b.count - a.count)
 }
 
-function buildStatusSeries(data: StatsOverview) {
+function buildStatusSeries(data: StatsOverview): StatusSeriesPoint[] {
   return Object.entries(data.by_status).map(([key, value]) => ({
     status: statusLabel(key as LeadStatus),
+    key,
     count: value,
     color: STATUS_COLORS[statusLabel(key as LeadStatus)] ?? T.textMuted,
   }))
 }
 
 // ─── custom tooltip ───────────────────────────────────────────────────────────
-function DarkTooltip({ active, payload, label }: any) {
+function DarkTooltip({ active, payload, label }: DarkTooltipProps) {
   if (!active || !payload?.length) return null
   return (
     <div style={{
@@ -171,7 +228,7 @@ function DarkTooltip({ active, payload, label }: any) {
   )
 }
 
-function BarTip({ active, payload, label }: any) {
+function BarTip({ active, payload, label }: BarTipProps) {
   if (!active || !payload?.length) return null
   return (
     <div style={{
@@ -186,7 +243,7 @@ function BarTip({ active, payload, label }: any) {
 }
 
 // ─── axis ticks ───────────────────────────────────────────────────────────────
-function CaptureAxisTick({ x = 0, y = 0, payload }: any) {
+function CaptureAxisTick({ x = 0, y = 0, payload }: CaptureAxisTickProps) {
   const label = payload?.payload?.tickLabel ?? ""; if (!label) return null
   return (
     <g transform={`translate(${x},${y})`}>
@@ -199,7 +256,7 @@ function CaptureAxisTick({ x = 0, y = 0, payload }: any) {
   )
 }
 
-function CategoryAxisTick({ x = 0, y = 0, payload }: any) {
+function CategoryAxisTick({ x = 0, y = 0, payload }: CategoryAxisTickProps) {
   const label = String(payload?.value ?? ""); if (!label) return null
   const words = label.split(" "); const mid = Math.ceil(words.length / 2)
   const l1 = words.slice(0, mid).join(" "); const l2 = words.slice(mid).join(" ")
@@ -335,13 +392,13 @@ export default function DashboardPage() {
     return () => { wsManager.disconnect() }
   }, [queryClient])
 
-  const categorySeries  = data ? toCategorySeries(data) : []
-  const statusSeries    = data ? buildStatusSeries(data) : []
-  const totalLeads      = data?.total_leads ?? 0
-  const replyRate       = data ? Math.round(data.reply_rate * 100) : 0
-  const capturedToday   = data?.captured_today ?? 0
-  const topLocation     = formatRegionName(data?.top_locations?.[0]?.location)
-  const totalPipeline   = statusSeries.reduce((s, x) => s + x.count, 0)
+  const categorySeries = data ? toCategorySeries(data) : []
+  const statusSeries = data ? buildStatusSeries(data) : []
+  const totalLeads = data?.total_leads ?? 0
+  const replyRate = data ? Math.round(data.reply_rate * 100) : 0
+  const capturedToday = data?.captured_today ?? 0
+  const topLocation = formatRegionName(data?.top_locations?.[0]?.location)
+  const totalPipeline = statusSeries.reduce((s, x) => s + x.count, 0)
 
   return (
     <m.div variants={containerVariants} initial="hidden" animate="visible"

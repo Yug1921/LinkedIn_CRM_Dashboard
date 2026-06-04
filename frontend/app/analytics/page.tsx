@@ -9,7 +9,6 @@ import {
   AreaChart,
   Bar,
   BarChart,
-  CartesianGrid,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   XAxis,

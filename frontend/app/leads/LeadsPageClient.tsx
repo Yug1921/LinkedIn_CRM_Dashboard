@@ -59,18 +59,17 @@ export default function LeadsPageClient() {
   const view = searchParams.get("view") ?? "all"
   const limit = Number(searchParams.get("limit") ?? "25")
   const offset = (currentPage - 1) * limit
+  const categoryParam = searchParams.get("category")
+  const statusParam = searchParams.get("status")
+  const searchParam = searchParams.get("search")
+  const countryParam = searchParams.get("country")
+  const scoreMinParam = searchParams.get("score_min")
+  const scoreMaxParam = searchParams.get("score_max")
+  const sortByParam = searchParams.get("sort_by")
 
   React.useEffect(() => {
     setCurrentPage(1)
-  }, [
-    searchParams.get("category"),
-    searchParams.get("status"),
-    searchParams.get("search"),
-    searchParams.get("country"),
-    searchParams.get("score_min"),
-    searchParams.get("score_max"),
-    searchParams.get("sort_by"),
-  ])
+  }, [categoryParam, statusParam, searchParam, countryParam, scoreMinParam, scoreMaxParam, sortByParam])
 
   const categoryKey = searchParams.getAll("category").join(",")
 
