@@ -5,10 +5,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import {
   ExternalLink,
+  Loader2,
   Mail,
   MessageSquare,
   MoreHorizontal,
   Sparkles,
+  Trash2,
 } from "lucide-react"
 
 import type { Lead, LeadStatus } from "@/types/lead"
@@ -78,6 +80,8 @@ type LeadTableProps = {
   isError?: boolean
   onRetry?: () => void
   onLeadClick: (lead: Lead) => void
+  // Pass current filters so export fetches the same filtered set
+  fetchAllLeads?: () => Promise<Lead[]>
 }
 
 export function LeadTable({
@@ -90,9 +94,11 @@ export function LeadTable({
   isError,
   onRetry,
   onLeadClick,
+  fetchAllLeads,
 }: LeadTableProps) {
   const queryClient = useQueryClient()
   const [selected, setSelected] = React.useState<Record<string, boolean>>({})
+  const [isExporting, setIsExporting] = React.useState(false)
 
   const updateStatus = useMutation({
     mutationFn: ({ leadId, status }: { leadId: string; status: LeadStatus }) =>
@@ -116,6 +122,17 @@ export function LeadTable({
     },
     onError: (error) => {
       toast.error("Draft failed", { description: String(error) })
+    },
+  })
+
+  const deleteLead = useMutation({
+    mutationFn: (leadId: string) => api.deleteLead(leadId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] })
+      toast.success("Lead deleted successfully")
+    },
+    onError: (error) => {
+      toast.error("Failed to delete lead", { description: String(error) })
     },
   })
 
@@ -155,45 +172,93 @@ export function LeadTable({
     setSelected((prev) => ({ ...prev, [leadId]: checked }))
   }
 
-  const exportCsv = () => {
-    if (!leads.length) {
-      toast.message("No leads to export")
-      return
-    }
+  // ── escape CSV cell value ──
+  const escapeValue = (value: string | number | null | undefined) =>
+    `"${String(value ?? "").replaceAll('"', '""')}"`
+
+  // ── build and trigger CSV download from a leads array ──
+  function downloadCsv(allLeads: Lead[]) {
     const headers = [
       "Name",
+      "Headline / Title",
       "Company",
-      "Title",
+      "Location",
       "Category",
       "Status",
       "Score",
       "Source",
-      "Location",
-      "Created",
+      "LinkedIn URL",
+      "Captured",
     ]
-    const rows = leads.map((lead) => [
+
+    const rows = allLeads.map((lead) => [
       lead.name,
+      lead.headline ?? lead.title ?? "",
       lead.company ?? "",
-      lead.title ?? "",
+      lead.location ?? "",
       lead.category ?? "",
       lead.status ?? "",
       lead.ai_score ?? "",
       lead.source ?? "",
-      lead.location ?? "",
+      // LinkedIn URL — key field
+      lead.linkedin_url ?? "",
       lead.created_at,
     ])
-    const escapeValue = (value: string | number | null | undefined) =>
-      `"${String(value ?? "").replaceAll('"', '""')}"`
+
     const csv = [headers, ...rows]
       .map((row) => row.map(escapeValue).join(","))
       .join("\n")
+
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`
+    link.download = `goteeoff-leads-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
     URL.revokeObjectURL(url)
+  }
+
+  // ── Export CSV — fetches ALL leads, not just current page ──
+  const exportCsv = async () => {
+    if (!totalCount) {
+      toast.message("No leads to export")
+      return
+    }
+
+    setIsExporting(true)
+    toast.message(`Preparing export of ${totalCount} leads…`)
+
+    try {
+      let allLeads: Lead[]
+
+      if (fetchAllLeads) {
+        allLeads = await fetchAllLeads()
+      } else {
+        // Backend caps limit at 200 — page through everything instead of one big request
+        const PAGE_SIZE = 200
+        const collected: Lead[] = []
+        let offset = 0
+
+        while (true) {
+          const res = await api.getLeads({ limit: PAGE_SIZE, offset })
+          collected.push(...res.items)
+
+          if (res.items.length < PAGE_SIZE || collected.length >= res.total) {
+            break
+          }
+          offset += PAGE_SIZE
+        }
+
+        allLeads = collected
+      }
+
+      downloadCsv(allLeads)
+      toast.success(`Exported ${allLeads.length} leads`)
+    } catch (err) {
+      toast.error("Export failed", { description: String(err) })
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   if (isError) {
@@ -251,14 +316,30 @@ export function LeadTable({
           {selectedCount ? <Badge variant="secondary">{selectedCount} selected</Badge> : null}
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={exportCsv}>
-            Export CSV
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void exportCsv()}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <span className="inline-flex items-center gap-1.5">
+                <Loader2 className="size-3 animate-spin" />
+                Exporting…
+              </span>
+            ) : (
+              `Export all ${totalCount} leads`
+            )}
           </Button>
           <Button
             variant="default"
             size="sm"
             onClick={() => queryClient.invalidateQueries({ queryKey: ["leads"] })}
-            style={{ backgroundColor: "var(--gt-accent)", color: "hsl(var(--primary-foreground))", borderColor: "var(--gt-accent-bdr)" }}
+            style={{
+              backgroundColor: "var(--gt-accent)",
+              color: "hsl(var(--primary-foreground))",
+              borderColor: "var(--gt-accent-bdr)",
+            }}
           >
             Refresh
           </Button>
@@ -269,7 +350,10 @@ export function LeadTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-10">
-              <Checkbox checked={allSelected} onCheckedChange={(value) => toggleAll(Boolean(value))} />
+              <Checkbox
+                checked={allSelected}
+                onCheckedChange={(value) => toggleAll(Boolean(value))}
+              />
             </TableHead>
             <TableHead>Lead</TableHead>
             <TableHead>Category</TableHead>
@@ -334,10 +418,17 @@ export function LeadTable({
               <TableCell className="text-xs text-text-muted">
                 {timeAgo(lead.created_at)}
               </TableCell>
-              <TableCell className="text-right" onClick={(event) => event.stopPropagation()}>
+              <TableCell
+                className="text-right"
+                onClick={(event) => event.stopPropagation()}
+              >
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={(event) => event.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(event) => event.stopPropagation()}
+                    >
                       <MoreHorizontal className="size-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -357,7 +448,10 @@ export function LeadTable({
                         onClick={() =>
                           generateDraft.mutate({
                             leadId: lead.id,
-                            payload: { outreach_type: action.outreachType, tone: "professional" },
+                            payload: {
+                              outreach_type: action.outreachType,
+                              tone: "professional",
+                            },
                           })
                         }
                       >
@@ -369,12 +463,31 @@ export function LeadTable({
                     {STATUS_ACTIONS.map((action) => (
                       <DropdownMenuItem
                         key={action.value}
-                        onClick={() => updateStatus.mutate({ leadId: lead.id, status: action.value })}
+                        onClick={() =>
+                          updateStatus.mutate({ leadId: lead.id, status: action.value })
+                        }
                       >
                         <Mail className="size-4" />
                         {action.label}
                       </DropdownMenuItem>
                     ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (
+                          confirm(
+                            `Are you sure you want to delete ${lead.name}? This action cannot be undone.`
+                          )
+                        ) {
+                          deleteLead.mutate(lead.id)
+                        }
+                      }}
+                      style={{ color: "#ff4d6d" }}
+                      className="text-red-500 focus:bg-red-50 focus:text-red-600"
+                    >
+                      <Trash2 className="size-4" />
+                      Delete
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
@@ -389,7 +502,8 @@ export function LeadTable({
             Page {currentPage} of {totalPages}
           </span>
           <span>
-            Showing {totalCount ? (currentPage - 1) * limit + 1 : 0}–{Math.min(currentPage * limit, totalCount)} of {totalCount} leads
+            Showing {totalCount ? (currentPage - 1) * limit + 1 : 0}–
+            {Math.min(currentPage * limit, totalCount)} of {totalCount} leads
           </span>
         </div>
         <Pagination>
@@ -428,14 +542,20 @@ export function LeadTable({
                 </Button>
               </PaginationItem>
             ))}
-            {pageNumbers[pageNumbers.length - 1] && pageNumbers[pageNumbers.length - 1] < totalPages - 1 ? (
+            {pageNumbers[pageNumbers.length - 1] &&
+            pageNumbers[pageNumbers.length - 1] < totalPages - 1 ? (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
             ) : null}
-            {pageNumbers[pageNumbers.length - 1] && pageNumbers[pageNumbers.length - 1] < totalPages ? (
+            {pageNumbers[pageNumbers.length - 1] &&
+            pageNumbers[pageNumbers.length - 1] < totalPages ? (
               <PaginationItem>
-                <Button variant="ghost" size="icon" onClick={() => handlePageChange(totalPages)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handlePageChange(totalPages)}
+                >
                   {totalPages}
                 </Button>
               </PaginationItem>
@@ -444,7 +564,9 @@ export function LeadTable({
               <Button
                 variant="ghost"
                 size="default"
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                onClick={() =>
+                  handlePageChange(Math.min(totalPages, currentPage + 1))
+                }
                 disabled={currentPage >= totalPages}
               >
                 Next

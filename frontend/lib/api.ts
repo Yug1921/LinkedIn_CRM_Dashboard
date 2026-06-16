@@ -252,4 +252,9 @@ export const api = {
     })
     return mapLead(data)
   },
+  async deleteLead(leadId: string): Promise<void> {
+    await apiFetch(`/api/leads/${leadId}`, {
+      method: "DELETE",
+    })
+  },
 }
