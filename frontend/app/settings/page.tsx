@@ -143,7 +143,7 @@ function InviteTeamCard() {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="text-sm text-text-muted">
-          Generate a 48-hour invite link for a new team member. They'll set their own
+          Generate a 48-hour invite link for a new team member. They&rsquo;ll set their own
           password when they open it — no account is created until they do.
         </div>
 
@@ -241,7 +241,7 @@ function InviteTeamCard() {
               Invite link generated — expires in 48 hours
             </div>
             <p className="text-xs text-text-muted">
-              Copy this link and send it to the invitee. They'll set their own password
+              Copy this link and send it to the invitee. They&rsquo;ll set their own password
               when they open it.
             </p>
             <div className="flex items-center gap-2">

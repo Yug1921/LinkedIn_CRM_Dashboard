@@ -8,7 +8,7 @@
  * On submit → POST /auth/register → account created → success screen → /login
  */
 
-import { useState, useEffect, type FormEvent } from "react"
+import { Suspense, useState, useEffect, type FormEvent } from "react"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Check } from "lucide-react"
@@ -18,6 +18,14 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000"
 type InvitePreview = { email: string; full_name: string }
 
 export default function InvitePage() {
+  return (
+    <Suspense fallback={null}>
+      <InvitePageInner />
+    </Suspense>
+  )
+}
+
+function InvitePageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
@@ -131,7 +139,7 @@ export default function InvitePage() {
           {!registered && !tokenError && preview && (
             <>
               <div className="inv-head">
-                <h1>You're invited</h1>
+                <h1>You&rsquo;re invited</h1>
                 <p>
                   Set a password to activate your GoTeeOff account for{" "}
                   <strong>{preview.email}</strong>.
