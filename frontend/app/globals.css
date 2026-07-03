@@ -186,32 +186,7 @@
   }
 
   .nav-link {
-    transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
-  }
-
-  .nav-link[data-active="true"] {
-    outline: none;
-    box-shadow: inset 0 0 0 1px var(--gt-accent-bdr);
-    transform: translateX(2px);
-  }
-
-  .nav-link:hover {
-    transform: translateX(2px);
-  }
-
-  /* When sidebar is collapsed, show active state as an icon-only pill */
-  aside.sidebar[data-expanded="false"] .nav-link[data-active="true"] {
-    background: transparent !important;
-    color: var(--gt-dim) !important;
-    box-shadow: none !important;
-    transform: none !important;
-  }
-
-  aside.sidebar[data-expanded="false"] .nav-link[data-active="true"] svg {
-    background: var(--gt-accent);
-    padding: 6px;
-    border-radius: 8px;
-    color: hsl(var(--primary-foreground));
+    transition: background-color 150ms ease, color 150ms ease;
   }
 }
 

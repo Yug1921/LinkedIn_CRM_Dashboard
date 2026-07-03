@@ -16,7 +16,6 @@ app.add_middleware(
         "http://localhost:3000",
         "https://linked-in-crm-dashboard.vercel.app",
         "https://linked-in-crm-dashboard-git-main-yugyugupadhyay-7261s-projects.vercel.app",
-        "*",
     ],
     allow_credentials=True,
     allow_methods=["*"],

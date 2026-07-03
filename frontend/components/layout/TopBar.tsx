@@ -2,19 +2,35 @@
 
 import * as React from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Bell, Moon, Search, Sun } from "lucide-react"
+import { Bell, LogOut, Moon, Search, Settings, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { InputGroup, InputGroupInput, InputGroupAddon } from "@/components/ui/input-group"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useDebounce } from "@/hooks/useDebounce"
+import { useUser, useAuth } from "@/lib/auth-context"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const titles: Record<string, string> = {
   "/": "Dashboard",
   "/leads": "Leads",
   "/analytics": "Analytics",
   "/settings": "Settings",
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return parts[0].slice(0, 2).toUpperCase()
 }
 
 export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
@@ -27,21 +43,21 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
   const { theme, setTheme } = useTheme()
   const isLeads = pathname === "/leads"
 
+  const user = useUser()
+  const { state, logout } = useAuth()
+  const isLoading = state.status === "loading"
+
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
   React.useEffect(() => {
-    if (!isLeads) {
-      return
-    }
+    if (!isLeads) return
     setSearchValue(searchParams.get("search") ?? "")
   }, [isLeads, searchParams])
 
   React.useEffect(() => {
-    if (!isLeads) {
-      return
-    }
+    if (!isLeads) return
     const params = new URLSearchParams(searchParams.toString())
     if (debouncedSearch.trim()) {
       params.set("search", debouncedSearch.trim())
@@ -52,14 +68,17 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
     }
     const nextQuery = params.toString()
     const currentQuery = searchParams.toString()
-    if (nextQuery === currentQuery) {
-      return
-    }
+    if (nextQuery === currentQuery) return
     router.replace(`${pathname}${nextQuery ? `?${nextQuery}` : ""}`)
   }, [debouncedSearch, isLeads, pathname, router, searchParams])
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark")
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    router.replace("/login")
   }
 
   return (
@@ -88,7 +107,7 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
       </div>
 
       <div className="flex items-center gap-3">
-          <Button
+        <Button
           variant="ghost"
           size="icon"
           onClick={toggleTheme}
@@ -111,9 +130,49 @@ export function TopBar({ capturedToday = 0 }: { capturedToday?: number }) {
             </div>
           ) : null}
         </div>
-        <Avatar style={{ backgroundColor: "var(--gt-accent)" }}>
-          <AvatarFallback className="bg-[var(--accent-dim)]" style={{ backgroundColor: "var(--gt-accent)", color: "hsl(var(--primary-foreground))" }}>GT</AvatarFallback>
-        </Avatar>
+
+        {isLoading ? (
+          <Skeleton className="size-8 rounded-full" />
+        ) : user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-full outline-none">
+                <Avatar style={{ backgroundColor: "#00e5a0" }}>
+                  <AvatarFallback style={{ backgroundColor: "#00e5a0", color: "#09090f", fontSize: "13px", fontWeight: 600 }}>
+                    {getInitials(user.full_name)}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56" sideOffset={8}>
+              <div className="px-2 pt-1.5 pb-1">
+                <p className="text-sm font-semibold text-foreground">{user.full_name}</p>
+                <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+              </div>
+              <div className="px-2 pb-1.5">
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
+                    user.is_admin
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                      : "border-border bg-muted text-muted-foreground"
+                  )}
+                >
+                  {user.is_admin ? "Admin" : "Member"}
+                </span>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
+                <Settings className="size-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} variant="destructive">
+                <LogOut className="size-4" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
       </div>
     </div>
   )

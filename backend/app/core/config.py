@@ -1,3 +1,9 @@
+"""
+backend/app/core/config.py  — UPDATED
+Only change: added FRONTEND_URL field (used by /auth/invite to build the link).
+Everything else is identical to your original.
+"""
+
 from pydantic_settings import BaseSettings
 from typing import List
 
@@ -18,6 +24,9 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000"
+
+    # Frontend (used to build invite links)          ← NEW
+    FRONTEND_URL: str = "http://localhost:3000"      # ← NEW
 
     # OpenRouter AI
     OPENROUTER_API_KEY: str
