@@ -12,6 +12,7 @@ import React, {
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000"
 const REFRESH_INTERVAL_MS = 50 * 60 * 1000
 const SESSION_KEY = "gt_auth_user"
+const LAST_REFRESH_KEY = "gt_last_refresh"
 
 export type AuthUser = {
   id: string
@@ -37,7 +38,7 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 function readCachedUser(): AuthUser | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY)
+    const raw = localStorage.getItem(SESSION_KEY)
     return raw ? (JSON.parse(raw) as AuthUser) : null
   } catch {
     return null
@@ -45,11 +46,12 @@ function readCachedUser(): AuthUser | null {
 }
 
 function writeCachedUser(user: AuthUser): void {
-  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(user)) } catch {}
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(user)) } catch {}
 }
 
 function clearCachedUser(): void {
-  try { sessionStorage.removeItem(SESSION_KEY) } catch {}
+  try { localStorage.removeItem(SESSION_KEY) } catch {}
+  try { localStorage.removeItem(LAST_REFRESH_KEY) } catch {}
 }
 
 async function doRefreshWithRetry(): Promise<string | null> {
@@ -105,42 +107,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false
 
     async function initAuth() {
+      const cached = readCachedUser()
+
+      // If we have a cached user AND a recent refresh (< 10 min ago),
+      // skip the refresh call — stay authenticated immediately.
+      const lastRefresh = Number(localStorage.getItem(LAST_REFRESH_KEY) ?? "0")
+      const age = Date.now() - lastRefresh
+      if (cached && age < 10 * 60 * 1000) {
+        setState({ status: "authenticated", user: cached, token: "" })
+        doRefreshWithRetry().then((token) => {
+          if (token) {
+            try {
+              localStorage.setItem(LAST_REFRESH_KEY, String(Date.now()))
+            } catch {}
+            setState((prev) =>
+              prev.status === "authenticated"
+                ? { ...prev, token }
+                : prev
+            )
+            scheduleRefresh()
+          }
+        })
+        return
+      }
+
+      // No cache or stale — do the full refresh + /me flow
       const token = await doRefreshWithRetry()
       if (cancelled) return
 
       if (!token) {
-        // Refresh failed — check if we have a cached user before giving up
-        const cached = readCachedUser()
-        if (cached) {
-          // Cross-origin cookie may have been dropped (samesite=none rollout).
-          // Stay authenticated optimistically and retry once after 2s.
+        const stillCached = readCachedUser()
+        if (stillCached) {
+          // Cross-origin timing issue — retry once after 2s
           await new Promise((r) => setTimeout(r, 2000))
           if (cancelled) return
-
           const retryToken = await doRefreshWithRetry()
           if (cancelled) return
-
           if (!retryToken) {
-            // Both attempts failed — session is genuinely expired
             tokenRef.current = null
             clearCachedUser()
             setState({ status: "unauthenticated" })
             return
           }
-
-          tokenRef.current = retryToken
-          setState({ status: "authenticated", user: cached, token: retryToken })
+          try {
+            localStorage.setItem(LAST_REFRESH_KEY, String(Date.now()))
+          } catch {}
+          setState({ status: "authenticated", user: stillCached, token: retryToken })
           scheduleRefresh()
           return
         }
-
-        // No cached user either — definitely not logged in
         tokenRef.current = null
         setState({ status: "unauthenticated" })
         return
       }
 
-      tokenRef.current = token
+      try {
+        localStorage.setItem(LAST_REFRESH_KEY, String(Date.now()))
+      } catch {}
       lastRefreshAt.current = Date.now()
 
       try {
@@ -155,10 +178,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         scheduleRefresh()
       } catch {
         if (cancelled) return
-        // /me failed but we have a token — use cached user as fallback
-        const cached = readCachedUser()
-        if (cached) {
-          setState({ status: "authenticated", user: cached, token })
+        const cached2 = readCachedUser()
+        if (cached2) {
+          setState({ status: "authenticated", user: cached2, token })
           scheduleRefresh()
         } else {
           tokenRef.current = null

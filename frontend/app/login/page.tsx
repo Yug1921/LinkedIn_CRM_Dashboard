@@ -9,7 +9,7 @@
  * Uses GoTeeOff design tokens (gt-bg, gt-surface, gt-accent, etc.)
  */
 
-import { useState, useEffect, type FormEvent } from "react"
+import { useState, useEffect, useRef, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const submittingRef = useRef(false)
 
   // Already authenticated → go straight to dashboard
   useEffect(() => {
@@ -30,6 +31,8 @@ export default function LoginPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    if (submittingRef.current) return
+    submittingRef.current = true
     setError(null)
     setLoading(true)
     try {
@@ -39,6 +42,7 @@ export default function LoginPage() {
       setError(err instanceof Error ? err.message : "Login failed")
     } finally {
       setLoading(false)
+      submittingRef.current = false
     }
   }
 
@@ -132,7 +136,13 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <button type="submit" className="gt-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="gt-btn"
+                aria-disabled={loading}
+                onClick={(e) => { if (loading) e.preventDefault() }}
+                style={{ pointerEvents: loading ? "none" : "auto", opacity: loading ? 0.6 : 1 }}
+              >
                 {loading ? <span className="gt-spinner" /> : "Sign in"}
               </button>
             </form>
