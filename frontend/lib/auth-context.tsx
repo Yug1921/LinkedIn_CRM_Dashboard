@@ -102,37 +102,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    ;(async () => {
+    let cancelled = false
+
+    async function initAuth() {
       const token = await doRefreshWithRetry()
-      if (token) {
-        tokenRef.current = token
-        lastRefreshAt.current = Date.now()
-      }
+      if (cancelled) return
 
       if (!token) {
+        // Refresh failed — check if we have a cached user before giving up
+        const cached = readCachedUser()
+        if (cached) {
+          // Cross-origin cookie may have been dropped (samesite=none rollout).
+          // Stay authenticated optimistically and retry once after 2s.
+          await new Promise((r) => setTimeout(r, 2000))
+          if (cancelled) return
+
+          const retryToken = await doRefreshWithRetry()
+          if (cancelled) return
+
+          if (!retryToken) {
+            // Both attempts failed — session is genuinely expired
+            tokenRef.current = null
+            clearCachedUser()
+            setState({ status: "unauthenticated" })
+            return
+          }
+
+          tokenRef.current = retryToken
+          setState({ status: "authenticated", user: cached, token: retryToken })
+          scheduleRefresh()
+          return
+        }
+
+        // No cached user either — definitely not logged in
         tokenRef.current = null
-        clearCachedUser()
         setState({ status: "unauthenticated" })
         return
       }
+
+      tokenRef.current = token
+      lastRefreshAt.current = Date.now()
 
       try {
         const res = await fetch(`${API_BASE}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!res.ok) throw new Error()
+        if (cancelled) return
         const user: AuthUser = await res.json()
         writeCachedUser(user)
         setState({ status: "authenticated", user, token })
         scheduleRefresh()
       } catch {
-        tokenRef.current = null
-        clearCachedUser()
-        setState({ status: "unauthenticated" })
+        if (cancelled) return
+        // /me failed but we have a token — use cached user as fallback
+        const cached = readCachedUser()
+        if (cached) {
+          setState({ status: "authenticated", user: cached, token })
+          scheduleRefresh()
+        } else {
+          tokenRef.current = null
+          setState({ status: "unauthenticated" })
+        }
       }
-    })()
+    }
+
+    void initAuth()
 
     return () => {
+      cancelled = true
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [scheduleRefresh])

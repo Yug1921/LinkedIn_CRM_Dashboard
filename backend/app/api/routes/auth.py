@@ -143,7 +143,9 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
         value=token,
         httponly=True,
         secure=settings.APP_ENV == "production",
-        samesite="lax",
+        # Cross-domain Vercel→Render requires samesite="none" (secure cookies).
+        # Local dev (http) falls back to "lax" because "none" requires secure=True.
+        samesite="none" if settings.APP_ENV == "production" else "lax",
         max_age=_REFRESH_EXP_DAYS * 86_400,
     )
 
@@ -237,10 +239,9 @@ def create_invite(
         raise HTTPException(status_code=400, detail="Email already registered")
 
     token = _make_invite_token(payload.email.lower(), payload.full_name, payload.is_admin)
-    frontend_url = getattr(settings, "FRONTEND_URL", "http://localhost:3000")
     return InviteResponse(
         invite_token=token,
-        invite_link=f"{frontend_url}/invite?token={token}",
+        invite_link=f"{settings.FRONTEND_URL}/invite?token={token}",
     )
 
 

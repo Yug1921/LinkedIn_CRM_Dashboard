@@ -25,8 +25,11 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: str = "http://localhost:3000"
 
-    # Frontend (used to build invite links)          ← NEW
-    FRONTEND_URL: str = "http://localhost:3000"      # ← NEW
+    # Frontend (used to build invite links)
+    # Production default: https://linked-in-crm-dashboard.vercel.app
+    # Override for local dev:  FRONTEND_URL=http://localhost:3000  in backend/.env
+    # Set on Render dashboard: FRONTEND_URL=https://linked-in-crm-dashboard.vercel.app
+    FRONTEND_URL: str = "https://linked-in-crm-dashboard.vercel.app"
 
     # OpenRouter AI
     OPENROUTER_API_KEY: str

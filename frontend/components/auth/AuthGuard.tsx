@@ -27,9 +27,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [state.status])
 
   useEffect(() => {
-    if (state.status === "unauthenticated") {
+    if (state.status !== "unauthenticated") return
+    const t = setTimeout(() => {
       router.replace("/login")
-    }
+    }, 300)
+    return () => clearTimeout(t)
   }, [state.status, router])
 
   if (state.status === "loading") {
