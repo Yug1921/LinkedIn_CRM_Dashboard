@@ -58,7 +58,7 @@ export default function LoginPage() {
         <div className="gt-brand">
           <div className="gt-brand-inner">
             <div className="gt-logo">
-              <Image src="/GoteeOff_logo.png" alt="GoTeeOff" width={36} height={36} className="rounded-lg" style={{ objectFit: "contain" }} />
+              <Image src="/GoteeOff_logo.png" alt="GoTeeOff" width={52} height={52} className="rounded-lg" style={{ objectFit: "contain" }} />
               <div className="gt-logo-text">
                 <span className="gt-logo-name">GoTeeOff</span>
                 <span className="gt-logo-sub">CRM</span>
@@ -187,25 +187,25 @@ const css = `
     padding: 64px 56px;
   }
 
-  .gt-logo { display: flex; align-items: center; gap: 12px; }
+  .gt-logo { display: flex; align-items: center; gap: 16px; }
 
   .gt-logo-mark {
     display: flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 8px;
+    width: 52px; height: 52px; border-radius: 8px;
     background: rgba(0,229,160,0.12);
-    color: #00e5a0; font-size: 13px; font-weight: 700;
+    color: #00e5a0; font-size: 15px; font-weight: 700;
     letter-spacing: 0.03em;
   }
 
-  .gt-logo-text { display: flex; flex-direction: column; gap: 1px; }
-  .gt-logo-name { font-size: 16px; font-weight: 700; color: #00e5a0; }
-  .gt-logo-sub  { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #55556a; }
+  .gt-logo-text { display: flex; flex-direction: column; gap: 2px; }
+  .gt-logo-name { font-size: 20px; font-weight: 700; color: #00e5a0; }
+  .gt-logo-sub  { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #55556a; }
 
   .gt-brand-copy h2 {
-    font-size: 30px; font-weight: 700; color: #e8e8f0;
+    font-size: 34px; font-weight: 700; color: #e8e8f0;
     line-height: 1.25; letter-spacing: -0.03em; margin-bottom: 14px;
   }
-  .gt-brand-copy p { font-size: 15px; color: #9494b0; line-height: 1.6; max-width: 340px; }
+  .gt-brand-copy p { font-size: 16px; color: #9494b0; line-height: 1.6; max-width: 360px; }
 
   .gt-stats { display: flex; align-items: center; gap: 28px; }
   .gt-stat  { display: flex; flex-direction: column; gap: 3px; }
@@ -235,20 +235,20 @@ const css = `
   .gt-card { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 30px; }
 
   .gt-card-head h1 {
-    font-size: 24px; font-weight: 700; color: #e8e8f0;
+    font-size: 26px; font-weight: 700; color: #e8e8f0;
     letter-spacing: -0.03em; margin-bottom: 6px;
   }
-  .gt-card-head p { font-size: 14px; color: #9494b0; }
+  .gt-card-head p { font-size: 15px; color: #9494b0; }
 
   .gt-form { display: flex; flex-direction: column; gap: 18px; }
 
   .gt-field { display: flex; flex-direction: column; gap: 7px; }
-  .gt-field label { font-size: 12px; font-weight: 500; color: #9494b0; letter-spacing: 0.01em; }
+  .gt-field label { font-size: 13px; font-weight: 500; color: #9494b0; letter-spacing: 0.01em; }
 
   .gt-field input {
     height: 42px; width: 100%;
     background: #18181f; border: 1px solid #252530; border-radius: 8px;
-    padding: 0 13px; font-size: 14px; color: #e8e8f0; outline: none;
+    padding: 0 13px; font-size: 15px; color: #e8e8f0; outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
     font-family: inherit;
   }
@@ -269,7 +269,7 @@ const css = `
   .gt-btn {
     height: 42px; width: 100%;
     background: #00e5a0; color: #09090f;
-    font-size: 14px; font-weight: 600; border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 600; border: none; border-radius: 8px;
     cursor: pointer; transition: background 0.15s, transform 0.1s;
     display: flex; align-items: center; justify-content: center;
     margin-top: 2px; font-family: inherit;
@@ -285,6 +285,6 @@ const css = `
   }
   @keyframes gt-spin { to { transform: rotate(360deg); } }
 
-  .gt-hint { font-size: 13px; color: #55556a; text-align: center; }
+  .gt-hint { font-size: 14px; color: #55556a; text-align: center; }
   .gt-hint span { color: #9494b0; }
 `

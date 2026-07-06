@@ -75,13 +75,7 @@ async function doRefreshWithRetry(): Promise<string | null> {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const cachedUser = typeof window !== "undefined" ? readCachedUser() : null
-
-  const [state, setState] = useState<AuthState>(
-    cachedUser
-      ? { status: "authenticated", user: cachedUser, token: "" }
-      : { status: "loading" }
-  )
+  const [state, setState] = useState<AuthState>({ status: "loading" })
 
   const tokenRef = useRef<string | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -98,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         tokenRef.current = token
         lastRefreshAt.current = Date.now()
+        try { localStorage.setItem(LAST_REFRESH_KEY, String(Date.now())) } catch {}
         scheduleRefresh()
       }
     }, REFRESH_INTERVAL_MS)
@@ -211,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
             tokenRef.current = token
             lastRefreshAt.current = Date.now()
+            try { localStorage.setItem(LAST_REFRESH_KEY, String(Date.now())) } catch {}
           }
         })
       }
@@ -231,6 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (token) {
           tokenRef.current = token
           lastRefreshAt.current = Date.now()
+          try { localStorage.setItem(LAST_REFRESH_KEY, String(Date.now())) } catch {}
           fetch(`${API_BASE}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
           })
@@ -268,7 +265,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const data: { access_token: string; user: AuthUser } = await res.json()
     tokenRef.current = data.access_token
+    lastRefreshAt.current = Date.now()
     writeCachedUser(data.user)
+    try { localStorage.setItem(LAST_REFRESH_KEY, String(Date.now())) } catch {}
     setState({ status: "authenticated", user: data.user, token: data.access_token })
     scheduleRefresh()
   }, [scheduleRefresh])
