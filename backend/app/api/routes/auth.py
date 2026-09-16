@@ -138,14 +138,16 @@ def _decode(token: str) -> dict:
                             headers={"WWW-Authenticate": "Bearer"})
 
 def _set_refresh_cookie(response: Response, token: str) -> None:
+    cross_site_production = settings.APP_ENV == "production" or settings.FRONTEND_URL.startswith("https://")
     response.set_cookie(
         key="refresh_token",
         value=token,
         httponly=True,
-        secure=settings.APP_ENV == "production",
+        secure=cross_site_production,
         # Cross-domain Vercel→Render requires samesite="none" (secure cookies).
         # Local dev (http) falls back to "lax" because "none" requires secure=True.
-        samesite="none" if settings.APP_ENV == "production" else "lax",
+        samesite="none" if cross_site_production else "lax",
+        path="/",
         max_age=_REFRESH_EXP_DAYS * 86_400,
     )
 
@@ -219,7 +221,7 @@ def refresh(
 
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie("refresh_token", path="/auth/refresh")
+    response.delete_cookie("refresh_token", path="/")
     return {"detail": "Logged out"}
 
 
