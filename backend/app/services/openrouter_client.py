@@ -21,7 +21,7 @@ class OpenRouterClient:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",
-            "X-Title": "GoTeeOff CRM",
+            "X-Title": "LeadCapture CRM",
         }
         payload = {
             "model": self.model,
@@ -53,7 +53,7 @@ class OpenRouterClient:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "http://localhost",
-            "X-Title": "GoTeeOff CRM",
+            "X-Title": "LeadCapture CRM",
         }
         payload = {
             "model": self.model,

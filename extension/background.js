@@ -1,4 +1,4 @@
-// GoTeeOff Lead Capture — background.js v2.0 (production-stable)
+// LeadCapture Lead Capture — background.js v2.0 (production-stable)
 // ──────────────────────────────────────────────────────────────
 // ROOT CAUSE FIXES:
 //  1. setInterval for offline queue flush — ILLEGAL in MV3 service workers.
@@ -16,7 +16,7 @@
 //     SW and can trigger the 30 s SW lifetime limit on slow connections. Fixed: proper
 //     await with reasonable timeout.
 
-const LOG = (msg, data) => console.log('[GoTeeOff BG]', msg, data !== undefined ? data : '');
+const LOG = (msg, data) => console.log('[LeadCapture BG]', msg, data !== undefined ? data : '');
 
 const DAILY_LIMIT = 80;
 const DEFAULT_API_BASE = 'https://linkedin-crm-dashboard.onrender.com';

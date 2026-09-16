@@ -1,4 +1,4 @@
-// GoTeeOff Lead Capture — popup.js v2.0 (production-stable)
+// LeadCapture Lead Capture — popup.js v2.0 (production-stable)
 // ──────────────────────────────────────────────────────────────
 // ROOT CAUSE FIXES:
 //  1. Activity log was maintained ONLY in popup memory — wiped on close.

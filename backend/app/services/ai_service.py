@@ -10,8 +10,8 @@ from app.constants import (
     HINT_TRAVEL_USER_ORG,
 )
 
-GOTEEOFF_POSITIONING = (
-    "GoTeeOff is the world's first AI-powered golf travel platform — connecting golfers to 800+ courses, "
+LEADCAPTURE_POSITIONING = (
+    "LeadCapture is an AI-powered lead intelligence platform that helps teams identify, qualify, and engage the right prospects efficiently, "
     "8,000+ services, and Web3 rewards across Asia-Pacific. Not just golf: hotels, tours, experiences — "
     "all in one place for the golfer, the family, for everyone."
 )
@@ -36,9 +36,9 @@ def build_scoring_prompt(raw_data: Dict[str, Any], category_hint: Optional[str])
     style = choose_style(category_hint)
 
     system = (
-        "You are an SDR assistant for GoTeeOff CRM. "
+        "You are an SDR assistant for LeadCapture CRM. "
         "You must return ONLY valid JSON. No extra text.\n"
-        "Scoring goal: prioritize leads that will help grow GoTeeOff LinkedIn followers and partnerships.\n"
+        "Scoring goal: prioritize leads that will help grow LeadCapture pipeline and partner opportunities.\n"
         "Output JSON schema:\n"
         "{"
         '"score": integer 0-100,'
@@ -52,12 +52,12 @@ def build_scoring_prompt(raw_data: Dict[str, Any], category_hint: Optional[str])
         "- Keep message compliant: no spammy claims, no aggressive selling.\n"
         "- If style is friendly_short: 2–3 lines max.\n"
         "- If style is formal_medium: 6–8 lines max.\n"
-        "- Mention GoTeeOff positioning briefly.\n"
+        "- Mention LeadCapture positioning briefly.\n"
         "- Offer types: barter collaboration, GTOT-based collab, B2B partnership.\n"
     )
 
     user = (
-        f"GoTeeOff positioning:\n{GOTEEOFF_POSITIONING}\n\n"
+        f"LeadCapture positioning:\n{LEADCAPTURE_POSITIONING}\n\n"
         f"Lead context:\n"
         f"- category_hint: {category_hint}\n"
         f"- profile_type: {profile_type}\n"

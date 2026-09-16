@@ -62,8 +62,8 @@ export function Sidebar() {
           className={cn(!expanded && "cursor-pointer")}
         >
           <Image
-            src="/GoteeOff_logo.png"
-            alt="GoTeeOff"
+            src="/leadcapture-logo.svg"
+            alt="LeadCapture"
             width={expanded ? 56 : 44}
             height={expanded ? 56 : 44}
             className="rounded-lg"
@@ -75,7 +75,7 @@ export function Sidebar() {
           <>
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-base font-bold truncate" style={{ color: "var(--gt-accent)" }}>
-                GoTeeOff
+                LeadCapture
               </span>
               <span className="text-[10px] uppercase tracking-[0.08em]" style={{ color: "var(--gt-muted)" }}>
                 CRM Platform
@@ -124,7 +124,7 @@ export function Sidebar() {
       {expanded && (
         <div className="flex items-center justify-end border-t border-[var(--gt-border)] px-5 py-3">
           <span className="text-[10px] uppercase tracking-[0.08em]" style={{ color: "var(--gt-muted)" }}>
-            GoTeeOff 2024
+            LeadCapture 2024
           </span>
         </div>
       )}

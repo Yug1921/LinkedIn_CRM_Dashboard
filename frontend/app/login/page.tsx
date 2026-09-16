@@ -6,7 +6,7 @@
  * Split-panel login page.
  * Left: branding panel (hidden on mobile).
  * Right: email + password form.
- * Uses GoTeeOff design tokens (gt-bg, gt-surface, gt-accent, etc.)
+ * Uses LeadCapture design tokens (gt-bg, gt-surface, gt-accent, etc.)
  */
 
 import { useState, useEffect, useRef, type FormEvent } from "react"
@@ -46,21 +46,44 @@ export default function LoginPage() {
     }
   }
 
-  // Avoid flash while session check is in progress
-  if (state.status === "loading" || state.status === "authenticated") return null
+  // Avoid flash while session check is in progress, but do not leave the page blank.
+  if (state.status === "loading" || state.status === "authenticated") {
+    return (
+      <>
+        <style dangerouslySetInnerHTML={{ __html: css }} />
+        <div className="gt-login-root gt-login-loading">
+          <div className="gt-form-panel">
+            <div className="gt-card gt-card-loading">
+              <div className="gt-logo">
+                <Image src="/leadcapture-logo.svg" alt="LeadCapture" width={52} height={52} className="rounded-lg" style={{ objectFit: "contain" }} />
+                <div className="gt-logo-text">
+                  <span className="gt-logo-name">LeadCapture</span>
+                  <span className="gt-logo-sub">CRM</span>
+                </div>
+              </div>
+              <div className="gt-loading-box">
+                <span className="gt-spinner" />
+                <span>Checking your session…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
-      <style>{css}</style>
+      <style dangerouslySetInnerHTML={{ __html: css }} />
       <div className="gt-login-root">
 
         {/* ── Left brand panel ─────────────────────────────── */}
         <div className="gt-brand">
           <div className="gt-brand-inner">
             <div className="gt-logo">
-              <Image src="/GoteeOff_logo.png" alt="GoTeeOff" width={52} height={52} className="rounded-lg" style={{ objectFit: "contain" }} />
+              <Image src="/leadcapture-logo.svg" alt="LeadCapture" width={52} height={52} className="rounded-lg" style={{ objectFit: "contain" }} />
               <div className="gt-logo-text">
-                <span className="gt-logo-name">GoTeeOff</span>
+                <span className="gt-logo-name">LeadCapture</span>
                 <span className="gt-logo-sub">CRM</span>
               </div>
             </div>
@@ -94,7 +117,7 @@ export default function LoginPage() {
           <div className="gt-card">
             <div className="gt-card-head">
               <h1>Welcome back</h1>
-              <p>Sign in to your GoTeeOff workspace</p>
+              <p>Sign in to your LeadCapture workspace</p>
             </div>
 
             <form onSubmit={handleSubmit} className="gt-form" noValidate>
@@ -210,7 +233,7 @@ const css = `
   .gt-stats { display: flex; align-items: center; gap: 28px; }
   .gt-stat  { display: flex; flex-direction: column; gap: 3px; }
   .gt-stat-num {
-    font-family: var(--font-mono, 'Space Mono', monospace);
+    font-family: var(--font-mono, "Space Mono", monospace);
     font-size: 26px; font-weight: 700; color: #00e5a0; letter-spacing: -0.03em;
   }
   .gt-stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #55556a; }
@@ -277,6 +300,29 @@ const css = `
   .gt-btn:hover:not(:disabled)  { background: #00ccad; }
   .gt-btn:active:not(:disabled) { transform: scale(0.99); }
   .gt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .gt-login-loading {
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .gt-card-loading {
+    align-items: center;
+    gap: 22px;
+    padding: 30px 24px;
+    border-radius: 16px;
+    background: rgba(17, 17, 24, 0.92);
+    border: 1px solid #252530;
+  }
+
+  .gt-loading-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #9494b0;
+    font-size: 14px;
+  }
 
   .gt-spinner {
     display: inline-block; width: 17px; height: 17px;

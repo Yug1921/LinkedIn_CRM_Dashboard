@@ -5,7 +5,7 @@ import uuid
 
 db = SessionLocal()
 
-email = "admin@goteeoff.com"
+email = "admin@company.com"
 existing = db.query(User).filter(User.email == email).first()
 if existing:
     print("Admin already exists:", email)

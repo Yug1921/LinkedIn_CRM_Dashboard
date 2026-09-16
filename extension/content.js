@@ -1,4 +1,4 @@
-// GoTeeOff Lead Capture — content.js v2.0 (production-stable)
+// LeadCapture Lead Capture — content.js v2.0 (production-stable)
 // ─────────────────────────────────────────────────────────────
 // ROOT CAUSE FIXES:
 //  1. Infinite retry loop → captureProfilePage/captureCompanyPage had unbounded
@@ -11,11 +11,11 @@
 (function () {
   'use strict';
 
-  if (window.__goteeoff_loaded) return; // guard against duplicate injection
-  window.__goteeoff_loaded = true;
+  if (window.__leadcapture_loaded) return; // guard against duplicate injection
+  window.__leadcapture_loaded = true;
 
   if (typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) {
-    console.log('[GoTeeOff] Chrome APIs not available, skipping')
+    console.log('[LeadCapture] Chrome APIs not available, skipping')
     return
   }
 
@@ -24,7 +24,7 @@
     return local && typeof local.get === 'function' ? local : null
   }
 
-  const LOG = (msg, data) => console.log('[GoTeeOff]', msg, data !== undefined ? data : '');
+  const LOG = (msg, data) => console.log('[LeadCapture]', msg, data !== undefined ? data : '');
   LOG('v2.0 loaded:', window.location.href);
 
   // ── Per-session dedup (prevents re-sending the same profile URL this session) ──

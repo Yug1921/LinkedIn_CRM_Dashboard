@@ -68,12 +68,12 @@ def _lead_about(lead: Lead) -> str:
 
 def _build_prompt(lead: Lead) -> Tuple[str, str]:
     system = (
-        "You are a lead scoring assistant for GoTeeOff, a golf technology platform that also has a Web3 token (GTOT). "
+        "You are a lead scoring assistant for LeadCapture, a general-purpose lead intelligence platform for revenue teams. "
         "Score leads on their relevance for outreach. Return ONLY a JSON object with two keys: score (integer 0-100) "
         "and reasoning (one sentence max 100 chars). No other text."
     )
 
-    user = f"""Score this LinkedIn lead for GoTeeOff outreach relevance.
+    user = f"""Score this LinkedIn lead for LeadCapture outreach relevance.
 
 Name: {lead.full_name}
 Headline: {_lead_headline(lead)}

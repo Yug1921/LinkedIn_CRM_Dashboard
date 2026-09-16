@@ -1,5 +1,5 @@
 """
-Auth routes for GoTeeOff CRM
+Auth routes for LeadCapture CRM
 ─────────────────────────────
 No public sign-up. Access is invite-only:
 

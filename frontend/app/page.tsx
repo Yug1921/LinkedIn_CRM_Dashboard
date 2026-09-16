@@ -321,7 +321,7 @@ function Panel({ title, subtitle, children, style }: {
   title: string; subtitle?: string; children: React.ReactNode; style?: React.CSSProperties
 }) {
   return (
-    <m.div variants={cardVariants} style={{ height: "100%" }}>
+    <m.div variants={cardVariants} style={{ height: "100%", minWidth: 0 }}>
       <div className="border border-border bg-surface" style={{ borderRadius: 10, padding: "20px", height: "100%", display: "flex", flexDirection: "column", ...style }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: T.text }}>{title}</div>
@@ -412,7 +412,7 @@ export default function DashboardPage() {
               Dashboard
             </div>
             <h1 style={{ fontSize: 22, fontWeight: 600, color: T.text, margin: 0, letterSpacing: "-0.01em" }}>
-              GoTeeOff overview
+              LeadCapture overview
             </h1>
             <p style={{ fontSize: 12, color: T.textMuted, margin: "4px 0 0" }}>
               Snapshot of pipeline health and AI capture
@@ -443,7 +443,7 @@ export default function DashboardPage() {
         </m.div>
 
         {/* ── capture trend + pipeline stages ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 12, marginBottom: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 320px", gap: 12, marginBottom: 12 }}>
 
           {/* capture trend */}
           <Panel title="Capture trend" subtitle="Daily lead captures over time">

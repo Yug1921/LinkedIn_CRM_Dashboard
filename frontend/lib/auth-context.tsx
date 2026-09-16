@@ -11,8 +11,20 @@ import React, {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000"
 const REFRESH_INTERVAL_MS = 50 * 60 * 1000
+const AUTH_REQUEST_TIMEOUT_MS = 10_000
 const SESSION_KEY = "gt_auth_user"
 const LAST_REFRESH_KEY = "gt_last_refresh"
+
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = AUTH_REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
 
 export type AuthUser = {
   id: string
@@ -58,7 +70,7 @@ async function doRefreshWithRetry(): Promise<string | null> {
   const delays = [800, 1600, 3200]
   for (let attempt = 0; attempt <= delays.length; attempt++) {
     try {
-      const res = await fetch(`${API_BASE}/auth/refresh`, {
+      const res = await fetchWithTimeout(`${API_BASE}/auth/refresh`, {
         method: "POST",
         credentials: "include",
       })
@@ -162,7 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       lastRefreshAt.current = Date.now()
 
       try {
-        const res = await fetch(`${API_BASE}/auth/me`, {
+        const res = await fetchWithTimeout(`${API_BASE}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!res.ok) throw new Error()
@@ -228,7 +240,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           tokenRef.current = token
           lastRefreshAt.current = Date.now()
           try { localStorage.setItem(LAST_REFRESH_KEY, String(Date.now())) } catch {}
-          fetch(`${API_BASE}/auth/me`, {
+          fetchWithTimeout(`${API_BASE}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
           })
             .then((r) => (r.ok ? r.json() : null))
@@ -253,7 +265,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     body.set("username", email)
     body.set("password", password)
 
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    const res = await fetchWithTimeout(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body.toString(),
@@ -273,7 +285,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [scheduleRefresh])
 
   const logout = useCallback(async () => {
-    await fetch(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
+    await fetchWithTimeout(`${API_BASE}/auth/logout`, { method: "POST", credentials: "include" })
     tokenRef.current = null
     clearCachedUser()
     if (timerRef.current) clearTimeout(timerRef.current)

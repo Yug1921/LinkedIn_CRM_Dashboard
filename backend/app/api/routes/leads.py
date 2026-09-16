@@ -127,7 +127,7 @@ def generate_lead_draft(lead_id: str, payload: LeadDraftRequest, db: Session = D
     raw = lead.raw_data or {}
 
     system = (
-        "You are an SDR assistant for GoTeeOff CRM."
+        "You are an SDR assistant for LeadCapture CRM."
         " Return ONLY a JSON object with a single key 'draft' whose value is the outreach message string."
         " Do not include any extra commentary."
     )
@@ -180,12 +180,12 @@ def generate_lead_draft(lead_id: str, payload: LeadDraftRequest, db: Session = D
         category = lead.category.value if getattr(lead.category, "value", None) else str(lead.category)
 
         system = (
-            "You write concise, high-conversion LinkedIn outreach messages for GoTeeOff.\n"
+            "You write concise, high-conversion LinkedIn outreach messages for LeadCapture.\n"
             "Return ONLY the message text. No quotes. No markdown. No emojis.\n"
             f"Hard limit: {limit} characters.\n"
             "Constraints:\n"
             "- Non-spammy, human, specific.\n"
-            "- Include a light GoTeeOff 1-liner.\n"
+            "- Include a light LeadCapture 1-liner.\n"
             "- Include one clear CTA question at the end.\n"
             "- If outreach_type is connection_request: keep it extra short.\n"
             "- If direct_message: slightly more context.\n"
@@ -194,7 +194,7 @@ def generate_lead_draft(lead_id: str, payload: LeadDraftRequest, db: Session = D
 
         user = (
             "Company positioning:\n"
-            "GoTeeOff is the world's first AI-powered golf travel platform — connecting golfers to 800+ courses, "
+            "LeadCapture is an AI-powered lead generation platform for modern sales teams — helping them identify, qualify, and engage high-value prospects efficiently, "
             "8,000+ services, and Web3 rewards across Asia-Pacific (hotels, tours, experiences — all in one place).\n\n"
             "Lead:\n"
             f"- full_name: {full_name}\n"

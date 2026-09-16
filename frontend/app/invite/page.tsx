@@ -92,9 +92,9 @@ function InvitePageInner() {
 
           {/* Logo */}
           <div className="inv-logo">
-            <Image src="/GoteeOff_logo.png" alt="GoTeeOff" width={34} height={34} className="rounded-lg" style={{ objectFit: "contain" }} />
+            <Image src="/leadcapture-logo.svg" alt="LeadCapture" width={34} height={34} className="rounded-lg" style={{ objectFit: "contain" }} />
             <div className="inv-logo-text">
-              <span className="inv-logo-name">GoTeeOff</span>
+              <span className="inv-logo-name">LeadCapture</span>
               <span className="inv-logo-sub">CRM</span>
             </div>
           </div>
@@ -141,7 +141,7 @@ function InvitePageInner() {
               <div className="inv-head">
                 <h1>You&rsquo;re invited</h1>
                 <p>
-                  Set a password to activate your GoTeeOff account for{" "}
+                  Set a password to activate your LeadCapture account for{" "}
                   <strong>{preview.email}</strong>.
                 </p>
               </div>

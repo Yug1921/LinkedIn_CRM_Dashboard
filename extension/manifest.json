@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GoTeeOff Lead Capture",
+  "name": "LeadCapture Lead Capture",
   "version": "1.4",
-  "description": "Capture LinkedIn leads into GoTeeOff CRM automatically while browsing.",
+  "description": "Capture LinkedIn leads into LeadCapture CRM automatically while browsing.",
   "permissions": ["storage", "activeTab", "scripting", "alarms"],
   "host_permissions": [
     "https://www.linkedin.com/*",
@@ -18,7 +18,7 @@
   }],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "GoTeeOff Lead Capture",
+    "default_title": "LeadCapture Lead Capture",
     "default_icon": { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
   },
   "content_security_policy": {

@@ -31,7 +31,7 @@ const spaceMono = Space_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "GoTeeOff CRM",
+  title: "LeadCapture CRM",
   description: "AI Lead Generation Dashboard",
 }
 

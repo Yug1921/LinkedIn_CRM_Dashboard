@@ -23,6 +23,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -99,6 +100,7 @@ export function LeadTable({
   const queryClient = useQueryClient()
   const [selected, setSelected] = React.useState<Record<string, boolean>>({})
   const [isExporting, setIsExporting] = React.useState(false)
+  const [openActionsLeadId, setOpenActionsLeadId] = React.useState<string | null>(null)
 
   const updateStatus = useMutation({
     mutationFn: ({ leadId, status }: { leadId: string; status: LeadStatus }) =>
@@ -129,6 +131,7 @@ export function LeadTable({
     mutationFn: (leadId: string) => api.deleteLead(leadId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads"] })
+      queryClient.invalidateQueries({ queryKey: ["queue-count"] })
       toast.success("Lead deleted successfully")
     },
     onError: (error) => {
@@ -213,7 +216,7 @@ export function LeadTable({
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `goteeoff-leads-${new Date().toISOString().slice(0, 10)}.csv`
+    link.download = `leadcapture-leads-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -422,17 +425,42 @@ export function LeadTable({
                 className="text-right"
                 onClick={(event) => event.stopPropagation()}
               >
-                <DropdownMenu>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Delete ${lead.name}`}
+                  title="Delete lead"
+                  className="mr-1 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    if (
+                      confirm(
+                        `Are you sure you want to delete ${lead.name}? This action cannot be undone.`
+                      )
+                    ) {
+                      deleteLead.mutate(lead.id)
+                    }
+                  }}
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+                <DropdownMenu
+                  open={openActionsLeadId === lead.id}
+                  onOpenChange={(open) => setOpenActionsLeadId(open ? lead.id : null)}
+                >
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label={`Open actions for ${lead.name}`}
+                      title="Lead actions"
                       onClick={(event) => event.stopPropagation()}
                     >
                       <MoreHorizontal className="size-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Lead actions</DropdownMenuLabel>
                     {lead.linkedin_url ? (
                       <DropdownMenuItem asChild>
                         <a href={lead.linkedin_url} target="_blank" rel="noreferrer">
@@ -441,6 +469,24 @@ export function LeadTable({
                         </a>
                       </DropdownMenuItem>
                     ) : null}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        setOpenActionsLeadId(null)
+                        if (
+                          confirm(
+                            `Are you sure you want to delete ${lead.name}? This action cannot be undone.`
+                          )
+                        ) {
+                          deleteLead.mutate(lead.id)
+                        }
+                      }}
+                    >
+                      <Trash2 className="size-4" />
+                      Delete lead
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     {DRAFT_ACTIONS.map((action) => (
                       <DropdownMenuItem
@@ -471,23 +517,6 @@ export function LeadTable({
                         {action.label}
                       </DropdownMenuItem>
                     ))}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        if (
-                          confirm(
-                            `Are you sure you want to delete ${lead.name}? This action cannot be undone.`
-                          )
-                        ) {
-                          deleteLead.mutate(lead.id)
-                        }
-                      }}
-                      style={{ color: "#ff4d6d" }}
-                      className="text-red-500 focus:bg-red-50 focus:text-red-600"
-                    >
-                      <Trash2 className="size-4" />
-                      Delete
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
